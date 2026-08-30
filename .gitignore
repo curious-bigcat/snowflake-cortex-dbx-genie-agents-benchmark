@@ -18,11 +18,11 @@ env/
 # Cortex Code / Snowflake local
 .snowflake/
 
-# Generated charts (reproducible from generate_charts.py)
-reports/charts/
+# Reports and chart generation
+reports/
 
-# HTML report (generated)
-reports/benchmark_visual.html
+# Data generators
+data_generator/
 
 # DBX trace data (raw benchmark output, not needed for reproduction)
 questions/databricks-info-data.md
