@@ -1,0 +1,75 @@
+
+FROM: Jennifer Walsh <jwalsh@meridiancapital.com>
+TO: Sarah Chen <schen@meridiancapital.com>
+CC: Robert Hartwell <rhartwell@meridiancapital.com>
+DATE: March 3, 2021 3:45 PM EST
+SUBJECT: ALERT: APEX Position Size - Approaching 5% Threshold
+
+Sarah, Rob,
+
+Per our daily position monitoring (Compliance Manual Section 18.1), I need to flag
+that our APEX Technologies position has reached approximately 4.8% of fund AUM
+(approximately $201 million at current market prices).
+
+Under our policy:
+- WARNING threshold: 5% ($210M) — we are approaching this
+- ALERT threshold: 7% ($294M)
+- BREACH threshold: 8% ($336M)
+
+Please confirm this position is authorized and within investment guidelines.
+I also note that APEX does not appear on our current research coverage list.
+
+Regards,
+Jennifer Walsh
+Chief Compliance Officer
+Meridian Capital Group LLC
+
+---
+
+FROM: Robert Hartwell <rhartwell@meridiancapital.com>
+TO: Jennifer Walsh <jwalsh@meridiancapital.com>
+CC: Sarah Chen <schen@meridiancapital.com>
+DATE: March 3, 2021 4:02 PM EST
+SUBJECT: RE: ALERT: APEX Position Size - Approaching 5% Threshold
+
+Jennifer,
+
+Authorized under Board Resolution 2021-047 (February 15, 2021) which approved
+$200M allocation to technology sector opportunities. APEX was identified by our
+quantitative screening models as significantly undervalued relative to peers.
+
+We will not exceed the 8% limit. Please close this alert.
+
+Rob
+
+---
+
+FROM: Jennifer Walsh <jwalsh@meridiancapital.com>
+TO: Robert Hartwell <rhartwell@meridiancapital.com>
+DATE: March 3, 2021 4:30 PM EST
+SUBJECT: RE: RE: ALERT: APEX Position Size - Approaching 5% Threshold
+
+Rob,
+
+Understood. I've noted the Board Resolution authorization. However, I also want to
+flag that per Section 5.2, I don't see a restricted list check logged for any of
+the APEX trades since February 28. Can you confirm these checks were performed?
+
+Also, I note 47 trades in a 4-day period for a name we've never traded before.
+Our Trade Surveillance system (Section 16.3) flagged this volume as unusual.
+Should I mark this as resolved?
+
+Jennifer
+
+---
+
+FROM: Robert Hartwell <rhartwell@meridiancapital.com>
+TO: Jennifer Walsh <jwalsh@meridiancapital.com>
+DATE: March 3, 2021 4:45 PM EST
+SUBJECT: RE: RE: RE: ALERT: APEX Position Size
+
+Jennifer — Yes, mark it as resolved. The restricted list checks were done verbally
+with Sarah. I'll have her backfill the log. This is a legitimate investment thesis.
+Please don't escalate further.
+
+Rob

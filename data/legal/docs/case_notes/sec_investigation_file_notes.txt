@@ -1,0 +1,64 @@
+
+================================================================================
+SECURITIES AND EXCHANGE COMMISSION
+DIVISION OF ENFORCEMENT
+
+INVESTIGATION FILE: HO-14289
+MATTER: Meridian Capital Group LLC — Insider Trading
+LEAD ATTORNEY: David R. Nakamura
+DATE OPENED: 2022-01-10
+================================================================================
+
+INVESTIGATION TIMELINE AND NOTES:
+
+January 10, 2022 — INVESTIGATION OPENED
+Referral from FINRA Market Regulation. FINRA surveillance detected unusual
+trading activity in APEX Technologies (NASDAQ: APEX) by Meridian Capital Group
+in the period February 28 - March 15, 2021. Pattern is consistent with trading
+on MNPI ahead of the March 15, 2021 merger announcement.
+
+Key observations from FINRA referral:
+- Meridian had ZERO position in APEX prior to Feb 28, 2021
+- Between Feb 28 and March 15: accumulated 2,847,000 shares
+- Also purchased 15,000 call option contracts
+- Timing: All purchases occurred BEFORE public announcement on March 15
+- Profit: Estimated $89,700,000
+
+January 15, 2022 — FORMAL ORDER OF INVESTIGATION
+Commission authorized formal investigation. Subpoena authority granted.
+
+February 1, 2022 — SUBPOENAS ISSUED
+- Meridian Capital Group: All trading records, communications, compliance files
+- Goldman Sachs (prime broker): All APEX transactions for Meridian accounts
+- Global Systems Corp: All parties who knew about merger prior to announcement
+
+March 2022 — DOCUMENT PRODUCTION
+Received 2.4 million pages of documents from Meridian. Key discovery:
+- Email from Hartwell to Chen (Feb 23, 2021): "Move on APEX immediately"
+- Board Resolution 2021-047 (Feb 15, 2021): $200M tech allocation
+- Trading logs showing 47 trades with NO restricted list checks
+
+April 2022 — CHEN APPROACHES FOR COOPERATION
+Sarah Chen's personal attorney (Michael R. Oakes) contacted
+our office. Chen willing to provide testimony in exchange for:
+- No enforcement action against her personally
+- Cooperation credit in any proceedings
+
+May 1, 2022 — COOPERATION AGREEMENT EXECUTED
+Chen signed formal cooperation agreement. Key testimony:
+- Hartwell received tip at dinner on 2021-02-22
+- Hartwell directed her to "skip compliance BS"
+- She knew it was wrong but followed CEO's instructions
+- Board Resolution was pre-existing, used as cover AFTER the tip
+
+May 2022 — PARALLEL CRIMINAL REFERRAL
+Referred matter to SDNY U.S. Attorney's Office for potential criminal charges
+against Hartwell (wire fraud, securities fraud).
+
+June 15, 2022 — COMPLAINT FILED
+Case number: SDNY-2022-CIV-04851
+
+TOTAL ILLEGAL PROFITS:
+  Meridian Capital: $89,700,000
+  Pacific Growth Partners: $34,200,000
+  TOTAL: $123,900,000

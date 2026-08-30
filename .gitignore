@@ -1,0 +1,28 @@
+# OS
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+
+# Cortex Code / Snowflake local
+.snowflake/
+
+# Generated charts (reproducible from generate_charts.py)
+reports/charts/
+
+# HTML report (generated)
+reports/benchmark_visual.html
+
+# DBX trace data (raw benchmark output, not needed for reproduction)
+questions/databricks-info-data.md

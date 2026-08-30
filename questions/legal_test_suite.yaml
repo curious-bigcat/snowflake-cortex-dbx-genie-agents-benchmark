@@ -1,0 +1,1122 @@
+# Legal Benchmark - Coherent Test Suite
+
+  # ===========================================================================
+  # TIER 6: PLATFORM DIFFERENTIATOR QUESTIONS (12 Qs)
+  # Designed to exploit Cortex advantages: semantic model code decoding,
+  # verified queries for noise filtering, model selection, and
+  # hybrid doc+SQL with Cortex Search filter attributes.
+  # ===========================================================================
+
+  # --- Coded Column Decoding (Semantic Model) ---
+
+  - id: P01
+    tier: platform_differentiator
+    category: coded_columns
+    question: "How many plaintiffs filed motions to dismiss across all securities fraud cases in 2022?"
+    requires: "pty_role_cd = 'PLF' + evt_typ_cd = 'MTD' + case_typ_cd = 'SEC' + date filtering"
+    cortex_advantage: "Semantic model decodes PLF=Plaintiff, MTD=Motion to Dismiss, SEC=Securities Fraud"
+    answer: |
+      Requires joining tbl_pty_info (pty_role_cd='PLF') → tbl_case_pty_atty → tbl_evt_log (evt_typ_cd='MTD')
+      → tbl_case_mstr (case_typ_cd='SEC', filing year 2022).
+      Without semantic model, agent must guess what PLF, MTD, SEC mean from raw column names.
+
+  - id: P02
+    tier: platform_differentiator
+    category: coded_columns
+    question: "List all cases where the defendant was granted summary judgment but the ruling was later reversed on appeal."
+    requires: "pty_role_cd = 'DEF' + ruling_outcome_cd = 'GRT' + evt_typ_cd = 'SJ' + appeal_outcome_cd = 'REV'"
+    cortex_advantage: "Four coded column mappings defined in semantic model (DEF, GRT, SJ, REV)"
+    answer: |
+      Join tbl_ruling (ruling_outcome_cd='GRT', ruling_type involving SJ) → tbl_appeal (appeal_outcome_cd='REV')
+      on the same docket_no. Requires decoding 4 separate coded columns correctly.
+
+  - id: P03
+    tier: platform_differentiator
+    category: coded_columns
+    question: "What percentage of SEC enforcement actions result in settlements versus going to trial?"
+    requires: "case_typ_cd = 'SEC' + stl_terms_cd values + evt_typ_cd for trial events"
+    cortex_advantage: "Semantic model defines SEC=enforcement, maps settlement vs trial event codes"
+    answer: |
+      Count cases in tbl_case_mstr where case_typ_cd='SEC', then check tbl_settlement
+      (has settlement record) vs tbl_evt_log (has trial/verdict event). Calculate percentage.
+
+  # --- Complex Join Paths (Semantic Model Relationships) ---
+
+  - id: P04
+    tier: platform_differentiator
+    category: join_paths
+    question: "For each attorney who represented both plaintiffs and defendants in different cases, show their total case count and how many they won on each side."
+    requires: "tbl_atty_reg → tbl_case_pty_atty → tbl_pty_info (self-join on attorney across roles) + tbl_ruling for outcomes"
+    cortex_advantage: "Semantic model defines join paths between all 4 tables and role code meanings"
+    answer: |
+      Self-join tbl_case_pty_atty on atty_id where the same attorney appears with pty_role_cd='PLF'
+      in some cases and pty_role_cd='DEF' in others. Then join to tbl_ruling for win/loss.
+      Requires understanding the bridge table pattern + code decoding.
+
+  - id: P05
+    tier: platform_differentiator
+    category: join_paths
+    question: "Which judges have the highest rate of denying motions to dismiss in insider trading cases? What is the average time from case filing to MTD ruling for each?"
+    requires: "tbl_ruling (judge, MTD denial) → tbl_case_mstr (case type) → tbl_evt_log (timeline)"
+    cortex_advantage: "Three-table join with date arithmetic, relationships pre-defined in semantic model"
+    answer: |
+      Join tbl_ruling (ruling on MTD, denied) → tbl_case_mstr (case_typ_cd for insider trading)
+      → tbl_evt_log (filing date vs MTD ruling date). Group by judge, calculate denial rate and avg days.
+
+  # --- Noise Filtering (Verified Queries) ---
+
+  - id: P06
+    tier: platform_differentiator
+    category: noise_filtering
+    question: "What was the total disgorgement amount in the Meridian Capital insider trading case?"
+    requires: "Must filter to docket_no = 'SDNY-2022-CIV-04851' among 50,000 cases"
+    cortex_advantage: "Verified query maps 'Meridian' → specific docket number, avoids noise contamination"
+    answer: |
+      The SEC sought disgorgement of $89,700,000. Must query tbl_damages or tbl_evt_log
+      filtered specifically to the Meridian docket. Without filtering, the 49,997 noise cases
+      will contaminate the result.
+
+  - id: P07
+    tier: platform_differentiator
+    category: noise_filtering
+    question: "How many trading days elapsed between Hartwell's tip and the first Meridian trade in Apex?"
+    requires: "Must find specific events for Meridian case in tbl_evt_log (500K rows)"
+    cortex_advantage: "Verified query knows tip date (2021-02-22), first trade (2021-02-28)"
+    answer: |
+      Tip: February 22, 2021. First trade: February 28, 2021.
+      Trading days between: 4 (Feb 23, 24, 25, 26).
+      Must locate these specific dates in 500K event log rows for the correct case.
+
+  - id: P08
+    tier: platform_differentiator
+    category: noise_filtering
+    question: "Calculate the total penalties across ALL three Meridian-related proceedings: SEC enforcement, class action settlement, and criminal case."
+    requires: "Must identify 3 specific docket numbers among 50K cases and sum correctly"
+    cortex_advantage: "Verified queries map Meridian to all 3 docket numbers, preventing noise contamination"
+    answer: |
+      SEC (SDNY-2022-CIV-04851): disgorgement $89.7M + penalties
+      Class action (SDNY-2023-CIV-00892): settlement $347.5M
+      Criminal (SDNY-2022-CRM-01247): forfeiture $42M + restitution $89.7M
+      Total: ~$568.9M. Agent must find all 3 cases and not pull from unrelated cases.
+
+  # --- Model Quality (LLM Selection) ---
+
+  - id: P09
+    tier: platform_differentiator
+    category: model_quality
+    question: "The SEC complaint alleges violations of Section 10(b) and Rule 10b-5. The court analyzed scienter under Tellabs. But Tellabs applies to PRIVATE securities litigation under the PSLRA. Does the Tellabs heightened pleading standard actually apply to SEC ENFORCEMENT actions? Identify the legal error."
+    requires: "Knowledge of PSLRA vs SEC enforcement standards — requires frontier model reasoning"
+    cortex_advantage: "User can select claude-opus for strongest reasoning; Genie uses platform-managed model"
+    answer: |
+      TRAP: Tellabs interprets the PSLRA for PRIVATE plaintiffs. The SEC is NOT subject to
+      PSLRA — only basic Rule 8 notice pleading (Twombly/Iqbal). Applying Tellabs to SEC
+      enforcement is an unnecessarily high standard. But if SEC meets Tellabs, it necessarily
+      meets the lower standard too — so the ruling (MTD denied) is correct.
+
+  - id: P10
+    tier: platform_differentiator
+    category: model_quality
+    question: "The attorney memo says 85-90% SEC win probability. But that's a single-stage figure for trial. What is the CUMULATIVE probability of the SEC winning across ALL litigation milestones from filing through trial verdict?"
+    requires: "Multi-step probability reasoning across 5 litigation stages"
+    cortex_advantage: "Requires frontier model for compounding probability analysis"
+    answer: |
+      Discovery: ~95%, Class cert: ~80%, Summary judgment: ~75%, Daubert: ~90%, Trial: ~90%
+      Cumulative (pre-MTD): 0.95 × 0.80 × 0.75 × 0.90 × 0.90 = ~46%
+      Post-settlement (after MTD/cert/SJ passed): 0.90 × 0.90 = ~81%
+      The 85-90% is MISLEADING — single stage, not cumulative.
+
+  # --- Hybrid Document + SQL with Filter Attributes ---
+
+  - id: P11
+    tier: platform_differentiator
+    category: hybrid_filtered
+    question: "According to Section 5.2 of the compliance manual, what is the penalty for failing to check the restricted list? How many trades in our database were executed without this check for the Meridian case?"
+    requires: "compliance_manual (Section 5.2) + tbl_evt_log filtered to Meridian docket"
+    cortex_advantage: "Cortex Search filters document_category='compliance_manual' then SQL on tbl_evt_log"
+    answer: |
+      Compliance Manual §5.2: Failure is a "material compliance violation subject to immediate
+      escalation under Section 14.7." All 47 Meridian trades had no restricted list check.
+
+  - id: P12
+    tier: platform_differentiator
+    category: hybrid_filtered
+    question: "The expert report estimates $17.28 per-share inflation. The settlement agreement defines 'Recognized Loss' for distribution. Are these the same number? Explain the difference using both documents."
+    requires: "expert_report (inflation methodology) + settlement_agreement (allocation formula)"
+    cortex_advantage: "Cortex Search can filter by document_category to retrieve exactly the right two documents"
+    answer: |
+      NOT the same. $17.28 is PEAK inflation on announcement day (March 15).
+      "Recognized Loss" uses volume-weighted methodology varying by purchase date and holding period.
+      Per-share recovery ($3.42) is much lower: net fund / total recognized losses across all claimants.
+# All questions reference the same SEC v. Meridian Capital universe
+# Every hybrid question is answerable by chaining documents + tables
+
+questions:
+
+  # ===========================================================================
+  # TIER 1: Document Retrieval (10 Qs) — Find specific facts in long docs
+  # ===========================================================================
+  - id: L01
+    tier: document_retrieval
+    question: "What is the total amount of illegal profits alleged in the SEC complaint against Meridian Capital?"
+    source: sec_complaint
+    answer: "$123.9 million total ($89.7 million Meridian + $34.2 million Pacific Growth)"
+
+  - id: L02
+    tier: document_retrieval
+    question: "According to the compliance manual, what is the maximum single-name position limit as a percentage of fund AUM?"
+    source: compliance_manual
+    answer: "8% of fund AUM. At $4.2 billion AUM, the maximum is $336 million."
+
+  - id: L03
+    tier: document_retrieval
+    question: "What is the opt-out deadline in the Thornton v. Meridian settlement agreement?"
+    source: settlement_agreement
+    answer: "December 15, 2024"
+
+  - id: L04
+    tier: document_retrieval
+    question: "In Sarah Chen's deposition, what exact words did Hartwell use in his February 23, 2021 email?"
+    source: deposition
+    answer: "'Move on APEX immediately, before Thursday announcement'"
+
+  - id: L05
+    tier: document_retrieval
+    question: "What was the per-share merger consideration in the Apex Technologies / Global Systems merger agreement?"
+    source: merger_agreement
+    answer: "$84.00 per share in cash"
+
+  - id: L06
+    tier: document_retrieval
+    question: "What is the Material Adverse Effect dollar threshold in the Apex merger agreement?"
+    source: merger_agreement
+    answer: "$75,000,000 or 15% of consolidated net assets, whichever is less"
+
+  - id: L07
+    tier: document_retrieval
+    question: "According to the court opinion, why was the motion to dismiss denied?"
+    source: court_opinion
+    answer: "The SEC adequately pleaded scienter through the pattern of trading immediately after receipt of MNPI — strong inference that is cogent and at least as compelling as any opposing inference (citing Tellabs)."
+
+  - id: L08
+    tier: document_retrieval
+    question: "What is the attorney fee percentage and dollar amount in the settlement?"
+    source: settlement_agreement
+    answer: "22.5% of the Settlement Fund = $78,187,500"
+
+  - id: L09
+    tier: document_retrieval
+    question: "How many trades did Sarah Chen approve in Apex securities without checking the restricted list?"
+    source: deposition
+    answer: "47 trades between February 28 and March 15, 2021"
+
+  - id: L10
+    tier: document_retrieval
+    question: "What is Meridian's Form 13F filing threshold according to their Form ADV?"
+    source: form_adv
+    answer: "$100,000,000 in Section 13(f) securities aggregate fair market value"
+
+  # ===========================================================================
+  # TIER 2: Structured Data Queries (10 Qs) — Test coded column understanding
+  # ===========================================================================
+  - id: L11
+    tier: structured_query
+    question: "What is the settlement amount for case SDNY-2023-CIV-00892?"
+    ground_truth_sql: |
+      SELECT stl_amt FROM tbl_settlement
+      WHERE docket_no = 'SDNY-2023-CIV-00892'
+    answer: "$347,500,000"
+
+  - id: L12
+    tier: structured_query
+    question: "Who are the defendants in case SDNY-2022-CIV-04851?"
+    ground_truth_sql: |
+      SELECT p.pty_nm, cpa.pty_role_cd
+      FROM tbl_case_pty_atty cpa
+      JOIN tbl_pty_info p ON cpa.pty_id = p.pty_id
+      WHERE cpa.docket_no = 'SDNY-2022-CIV-04851' AND cpa.pty_role_cd = 'DEF'
+    answer: "Meridian Capital Group LLC, Robert J. Hartwell, Pacific Growth Partners LP, Marcus D. Zhang"
+
+  - id: L13
+    tier: structured_query
+    question: "What was the ruling on the motion to dismiss in the SEC v. Meridian case?"
+    ground_truth_sql: |
+      SELECT ruling_cd, ruling_dt, reasoning_txt
+      FROM tbl_ruling
+      WHERE docket_no = 'SDNY-2022-CIV-04851' AND mtn_typ_cd = 'MTD'
+    answer: "DNY (Denied) on 2023-01-08"
+
+  - id: L14
+    tier: structured_query
+    question: "What statutes were cited in the motion to dismiss ruling?"
+    ground_truth_sql: |
+      SELECT sc.statute_ref
+      FROM tbl_statute_cite sc
+      JOIN tbl_ruling r ON sc.ruling_id = r.ruling_id
+      WHERE r.docket_no = 'SDNY-2022-CIV-04851' AND r.mtn_typ_cd = 'MTD'
+    answer: "15 USC 78j(b), 17 CFR 240.10b-5, Fed.R.Civ.P. 12(b)(6)"
+
+  - id: L15
+    tier: structured_query
+    question: "What is the total damages sought in the SEC enforcement case?"
+    ground_truth_sql: |
+      SELECT SUM(d.amt_sought) as total_sought
+      FROM tbl_damages d
+      JOIN tbl_claim c ON d.claim_id = c.claim_id
+      WHERE c.docket_no = 'SDNY-2022-CIV-04851'
+    answer: "$462,000,000 (statutory $412M + punitive $50M)"
+
+  - id: L16
+    tier: structured_query
+    question: "Who is the lead counsel for the plaintiff in the class action?"
+    ground_truth_sql: |
+      SELECT a.atty_nm, a.firm_nm
+      FROM tbl_case_pty_atty cpa
+      JOIN tbl_atty_reg a ON cpa.atty_id = a.atty_id
+      WHERE cpa.docket_no = 'SDNY-2023-CIV-00892'
+        AND cpa.pty_role_cd = 'PLF' AND cpa.lead_counsel_flg = 'Y'
+    answer: "Rachel Torres, Bernstein Litowitz Berger & Grossmann LLP"
+
+  - id: L17
+    tier: structured_query
+    question: "How many class members opted out of the settlement?"
+    ground_truth_sql: |
+      SELECT opt_out_cnt, class_sz
+      FROM tbl_settlement WHERE docket_no = 'SDNY-2023-CIV-00892'
+    answer: "342 out of 23,847 class members"
+
+  - id: L18
+    tier: structured_query
+    question: "What is the criminal sentence for Robert Hartwell?"
+    ground_truth_sql: |
+      SELECT evt_desc_txt
+      FROM tbl_evt_log
+      WHERE docket_no = 'SDNY-2022-CRM-01247' AND evt_typ_cd = 'JDG'
+    answer: "84 months imprisonment, $42M forfeiture, $89.7M restitution"
+
+  - id: L19
+    tier: structured_query
+    question: "When was class certification granted and how many investors are in the class?"
+    ground_truth_sql: |
+      SELECT evt_dt, evt_desc_txt
+      FROM tbl_evt_log
+      WHERE docket_no = 'SDNY-2023-CIV-00892' AND evt_desc_txt LIKE '%Class Certification GRANTED%'
+    answer: "September 15, 2023 — class of 23,847 investors"
+
+  - id: L20
+    tier: structured_query
+    question: "Is the SEC case related to any other cases? If so, which ones?"
+    ground_truth_sql: |
+      SELECT docket_no, related_case_no FROM tbl_case_mstr
+      WHERE docket_no = 'SDNY-2022-CIV-04851'
+    answer: "Yes, related to SDNY-2022-CRM-01247 (the criminal case against Hartwell)"
+
+  # ===========================================================================
+  # TIER 3: Hybrid Cross-Source (15 Qs) — Require BOTH doc retrieval + SQL
+  # ===========================================================================
+  - id: L21
+    tier: hybrid
+    question: "The compliance manual requires reporting violations to the CCO within 72 hours. The first suspicious trade occurred on February 28, 2021. When was the SEC investigation actually opened according to our case records? How many days elapsed?"
+    requires: "compliance_manual (72-hour rule) + tbl_evt_log (SEC investigation date)"
+    answer: "SEC investigation opened January 10, 2022 — approximately 316 days after the first trade. This massively exceeds the 72-hour internal reporting deadline."
+
+  - id: L22
+    tier: hybrid
+    question: "Sarah Chen's deposition states she approved 47 trades in Apex between Feb 28 and March 15, 2021. How many events are actually logged in our case system for case SDNY-2022-CIV-04851 during that period?"
+    requires: "deposition (47 trades claim) + tbl_evt_log (actual events for that case/period)"
+    answer: "Query tbl_evt_log for the case and date range. The 47 trades are in the fund's internal records, not necessarily in the court's event log (which tracks litigation events, not individual trades)."
+
+  - id: L23
+    tier: hybrid
+    question: "The merger agreement sets a Material Adverse Effect threshold of $75 million. The expert report estimates total damages at $412 million. What is the ratio of actual damages to the MAE threshold?"
+    requires: "merger_agreement (MAE=$75M) + expert_report (damages=$412M)"
+    answer: "$412M / $75M = 5.49x — the damages are approximately 5.5 times the MAE threshold."
+
+  - id: L24
+    tier: hybrid
+    question: "The settlement allocates $347.5 million to the class of 23,847 investors. Using the formula from the settlement agreement and the class size from our case records, what is the average per-member payout before fees?"
+    requires: "settlement_agreement (formula, amount) + tbl_settlement (class_sz)"
+    answer: "$347,500,000 / 23,847 = approximately $14,573 per class member before fees. After 22.5% attorney fees: ~$11,294 per member."
+
+  - id: L25
+    tier: hybrid
+    question: "The compliance manual states the maximum single-name position is 8% of AUM ($336M). Meridian held 2,847,000 shares of Apex at $78.50. Did this exceed the position limit?"
+    requires: "compliance_manual (8% limit, $336M max) + sec_complaint (shares and price)"
+    answer: "2,847,000 shares × $78.50 = $223.5M. This is 5.3% of $4.2B AUM — BELOW the 8% limit. The compliance manual itself notes this was within limits but above the 5% WARNING threshold."
+
+  - id: L26
+    tier: hybrid
+    question: "The court opinion cites Tellabs v. Makor Issues for the scienter standard. Is Tellabs cited in any other rulings in our database? How many times total?"
+    requires: "court_opinion (Tellabs cited) + tbl_ruling (precedent_cited field search)"
+    ground_truth_sql: |
+      SELECT COUNT(*) as tellabs_citations
+      FROM tbl_ruling WHERE precedent_cited LIKE '%Tellabs%'
+    answer: "Count all rulings where precedent_cited contains 'Tellabs'. At minimum, our key ruling cites it."
+
+  - id: L27
+    tier: hybrid
+    question: "The SEC complaint was filed on June 15, 2022. According to the court opinion, the statute of limitations is 5 years under 28 USC 2462. Is the case timely? When did the violations begin per the complaint?"
+    requires: "court_opinion (5-year SOL) + sec_complaint (first trade Feb 28, 2021) + tbl_case_mstr (filing date)"
+    answer: "First violation: Feb 28, 2021. Filing date: June 15, 2022. Elapsed: ~16 months. Well within the 5-year period. Case is timely."
+
+  - id: L28
+    tier: hybrid
+    question: "The settlement agreement states that 342 class members opted out. Our database also records opt_out_cnt. Do these numbers match?"
+    requires: "settlement_agreement (342 opt-outs) + tbl_settlement (opt_out_cnt)"
+    ground_truth_sql: |
+      SELECT opt_out_cnt FROM tbl_settlement WHERE docket_no = 'SDNY-2023-CIV-00892'
+    answer: "Both should show 342. This verifies data consistency between documents and database."
+
+  - id: L29
+    tier: hybrid
+    question: "The Form ADV states Meridian had no prior disciplinary actions as of March 2021. When was the SEC enforcement action actually filed? Was the Form ADV disclosure accurate at the time of filing?"
+    requires: "form_adv (no disciplinary history as of March 2021) + tbl_case_mstr (filing date 2022-06-15)"
+    answer: "Form ADV was filed March 31, 2021. SEC complaint was filed June 15, 2022 — over a year later. The Form ADV disclosure was accurate at the time it was filed."
+
+  - id: L30
+    tier: hybrid
+    question: "Chen's deposition mentions Board Resolution 2021-047 authorizing $200M for technology. The compliance manual requires Board approval for positions over a certain threshold. Was the $200M authorization within the Board's approval authority?"
+    requires: "deposition (Board Resolution 2021-047, $200M) + compliance_manual (approval thresholds)"
+    answer: "The compliance manual requires Board notification for positions exceeding 12% of AUM ($504M). The $200M authorization is below this threshold, so Board pre-approval wasn't strictly required — but Hartwell used it as cover regardless."
+
+  - id: L31
+    tier: hybrid
+    question: "The expert report calculates per-share inflation of $17.28. Apex stock went from $47.82 to $78.50 at announcement. Does the inflation figure match the actual price movement?"
+    requires: "expert_report ($17.28 inflation) + sec_complaint ($47.82 before, $78.50 after)"
+    answer: "Actual jump: $78.50 - $47.82 = $30.68. Expert's $17.28 is less than the full jump because the expert isolates the portion attributable to fraud (inside information leakage) vs. the legitimate market reaction to the merger announcement itself."
+
+  - id: L32
+    tier: hybrid
+    question: "The criminal case resulted in 84 months imprisonment and $89.7M restitution. The SEC case sought disgorgement of $89.7M. Are these the same amount? Why?"
+    requires: "tbl_evt_log (criminal sentence) + sec_complaint (disgorgement amount)"
+    answer: "Yes, both are $89.7M because the restitution equals Meridian's illegal profits. The criminal restitution is designed to make victims whole, matching the SEC's disgorgement of ill-gotten gains."
+
+  - id: L33
+    tier: hybrid
+    question: "The settlement is $347.5M but the expert estimated damages at $412M. What percentage recovery does this represent? Is this typical for securities class actions?"
+    requires: "settlement_agreement ($347.5M) + expert_report ($412M)"
+    answer: "$347.5M / $412M = 84.3% recovery. This is exceptionally high for securities class actions (median is typically 2-3% of damages). The high recovery reflects the strength of the case given the cooperating witness and criminal conviction."
+
+  - id: L34
+    tier: hybrid
+    question: "The merger closed on September 22, 2021 at $84/share. Meridian held 2,847,000 shares. What were Meridian's approximate gross proceeds from the merger, and how does this compare to the disgorgement the SEC is seeking?"
+    requires: "merger_agreement (closing date, $84/share) + sec_complaint (shares held) + sec_complaint (disgorgement $89.7M)"
+    answer: "Gross proceeds: 2,847,000 × $84 = $239.1M. Cost basis: 2,847,000 × ~$47.82 (avg purchase price) = $136.1M. Profit: $239.1M - $136.1M ≈ $103M. The SEC's $89.7M disgorgement figure likely uses a more precise calculation of actual prices paid."
+
+  - id: L35
+    tier: hybrid
+    question: "How many days elapsed between the SEC complaint filing and the settlement being reached? Cross-reference the dates from our case event log."
+    requires: "tbl_evt_log (filing date, settlement date)"
+    ground_truth_sql: |
+      SELECT
+        (SELECT evt_dt FROM tbl_evt_log WHERE docket_no = 'SDNY-2022-CIV-04851' AND evt_typ_cd = 'BRF' AND evt_desc_txt LIKE '%SEC files%') as filing,
+        (SELECT evt_dt FROM tbl_evt_log WHERE docket_no = 'SDNY-2022-CIV-04851' AND evt_typ_cd = 'STL') as settlement
+    answer: "Filed: June 15, 2022. Settlement: August 1, 2024. Elapsed: approximately 778 days (2 years, 1.5 months)."
+
+  # ===========================================================================
+  # TIER 4: Legal Reasoning (5 Qs) — Require domain knowledge + data
+  # ===========================================================================
+  - id: L36
+    tier: legal_reasoning
+    question: "Based on all available information, did Meridian's trading violate their own compliance manual BEFORE it violated securities law? Explain the timeline."
+    requires: "compliance_manual (restricted list rule) + sec_complaint (trade dates) + deposition (Chen didn't check list)"
+    answer: "Yes. The compliance manual violation (failure to check restricted list, Section 5.2) occurred on Feb 28, 2021 — the first trade date. The securities law violation (10b-5) also occurred on the same date. However, the internal compliance REPORTING violation (72-hour rule, Section 14.7) was breached because no one reported the violation until the SEC investigated in January 2022 — 316 days late."
+
+  - id: L37
+    tier: legal_reasoning
+    question: "The court denied the motion to dismiss citing adequate scienter. What specific evidence from the case database (event log, documents) supports the 'strong inference' standard from Tellabs?"
+    requires: "court_opinion (scienter analysis) + tbl_evt_log (timeline) + sec_complaint (trading pattern)"
+    answer: "The strong inference is supported by: (1) zero prior Apex trading (from complaint), (2) massive purchases starting 4 days after tip and 15 days before announcement (from timeline), (3) Chen's email showing advance knowledge ('before Thursday announcement'), (4) $89.7M in profits from a stock Meridian had never previously owned."
+
+  - id: L38
+    tier: legal_reasoning
+    question: "If a new class member discovers their claim AFTER the December 15, 2024 opt-out deadline, can they still participate in the settlement? What does the settlement agreement say about late exclusion requests?"
+    requires: "settlement_agreement (opt-out rules, Section 6)"
+    answer: "No. The settlement agreement at Section 6.3 explicitly states the deadline is 'FIRM AND NON-EXTENDABLE' and that 'no extensions will be granted for any reason, including claims of insufficient notice, incapacity, or late receipt of the Class Notice.' They are bound by the settlement."
+
+  - id: L39
+    tier: legal_reasoning
+    question: "Given that Hartwell received 84 months imprisonment and the SEC obtained $89.7M disgorgement, and the class settled for $347.5M — has the total monetary penalty across all proceedings exceeded the actual illegal profits? Calculate the total."
+    requires: "tbl_evt_log (criminal sentence) + sec_complaint (profits) + settlement"
+    answer: "Total penalties: Criminal forfeiture $42M + Criminal restitution $89.7M + SEC disgorgement $89.7M + Class settlement $347.5M = $568.9M. Illegal profits were $123.9M. Total penalties are 4.6x the illegal profits. Note: Some amounts may overlap (restitution may credit against settlement)."
+
+  - id: L40
+    tier: legal_reasoning
+    question: "The Apex merger closed at $84/share on September 22, 2021. Meridian continued trading Apex until May 30, 2022 per the SEC complaint. Why would Meridian trade a stock AFTER the merger closed? What could this imply?"
+    requires: "sec_complaint (trading period end May 2022) + merger_agreement (closed Sept 2021)"
+    answer: "After a merger closes, the acquired company's stock stops trading. The SEC complaint's trading period extending to May 2022 likely refers to: (1) trading in related securities or options that hadn't expired, (2) selling remaining positions in successor company stock, or (3) the overall scheme period including cover-up activities. This is an important detail for understanding the full scope of the alleged fraud."
+
+  # ===========================================================================
+  # TIER 5: HIGHLY COMPLEX — Multi-Hop Legal Reasoning + Hybrid (20 Qs)
+  # These require chaining 3+ sources, applying legal doctrine, resolving
+  # contradictions, and performing calculations across documents and tables.
+  # ===========================================================================
+
+  # --- Doctrinal Application ---
+
+  - id: L41
+    tier: complex_reasoning
+    question: "Hartwell's defense attorney estimates an 85-90% probability of SEC prevailing at trial. The settlement is $347.5M against estimated damages of $412M (84.3% recovery). Using these figures, calculate the expected value of going to trial vs. settling for BOTH sides. Was settling rational for both parties?"
+    requires: "attorney_memo (85-90% win probability) + settlement ($347.5M) + expert_report ($412M) + sec_complaint (disgorgement $89.7M + $15M personal penalty)"
+    answer: |
+      FOR THE SEC/CLASS:
+      - Expected value of trial: 87.5% × $412M = $360.5M (but delayed 2+ years, litigation costs ~$20M)
+      - Settlement value: $347.5M now (certain, no trial risk)
+      - Rational to settle: YES — $347.5M certain > $360.5M discounted and uncertain
+
+      FOR DEFENDANTS:
+      - Expected cost of trial: 87.5% × $412M = $360.5M + legal fees ($15-25M) + reputational damage
+      - Settlement cost: $347.5M + admission terms
+      - Rational to settle: YES — avoids ~$13M additional exposure + legal fees + uncertainty
+
+      BOTH parties acted rationally. The high settlement percentage (84.3%) reflects the extremely strong evidence (cooperating witness + emails + trading pattern).
+
+  - id: L42
+    tier: complex_reasoning
+    question: "The SEC complaint alleges violations of Section 10(b) and Rule 10b-5. The court opinion analyzes scienter under Tellabs. But Tellabs applies to PRIVATE securities litigation (PSLRA). Does the Tellabs heightened pleading standard actually apply to SEC ENFORCEMENT actions? Identify the legal error in the court's opinion."
+    requires: "court_opinion (Tellabs analysis) + knowledge of PSLRA vs. SEC enforcement standards"
+    answer: |
+      THIS IS A TRAP QUESTION. There IS a legal nuance here:
+      - Tellabs v. Makor Issues (2007) interprets the PSLRA's heightened pleading standard for PRIVATE plaintiffs
+      - The SEC, as a government enforcement agency, is NOT subject to the PSLRA's heightened pleading standards
+      - The SEC only needs to plead scienter under basic Rule 8 notice pleading (Twombly/Iqbal)
+      - The court opinion applying Tellabs to an SEC enforcement action is arguably applying an UNNECESSARILY HIGH standard
+      - However, if the SEC meets the Tellabs standard, it necessarily meets the lower standard too
+      - So the ruling (DENIED motion to dismiss) is correct even if the analytical framework is overly demanding
+
+      A sophisticated agent should note this distinction. An average agent will simply accept the court's framework.
+
+  - id: L43
+    tier: complex_reasoning
+    question: "Assume Pacific Growth Partners argues it had no duty to inquire about the source of Hartwell's tip because Hartwell said it was from 'quantitative screens.' Under Dirks v. SEC (1983), what must the SEC prove about a tippee's liability? Does the evidence in our documents meet that standard?"
+    requires: "knowledge of Dirks v. SEC tippee liability + sec_complaint (Pacific Growth's trading) + email_chain_02 (Hartwell's tip to Pacific Growth)"
+    answer: |
+      Under Dirks v. SEC, 463 U.S. 646 (1983), tippee liability requires:
+      1. The tipper (Hartwell) breached a fiduciary duty by disclosing MNPI
+      2. The tipper received a personal benefit from the tip
+      3. The tippee (Pacific Growth) KNEW OR SHOULD HAVE KNOWN the information was MNPI
+
+      Evidence from our documents:
+      - Hartwell's email to Pacific Growth: "don't wait on APEX. Next 2 weeks will be very interesting. Trust me on this one." — This is circumstantial evidence of a tip.
+      - Pacific Growth's trading began ONE DAY after the email (March 1, 2021)
+      - They accumulated 1,200,000 shares generating $34.2M in profits
+      - Hartwell's "trust me" language suggests a close relationship implying access to inside information
+
+      The "quantitative screens" defense is weak because:
+      - No documentation of any quantitative model output recommending APEX
+      - Timing (day after Hartwell's email) undermines independent analysis claim
+      - "Trust me on this one" is not how quantitative recommendations are communicated
+
+      The SEC likely meets the Dirks standard — Pacific Growth "should have known."
+
+  - id: L44
+    tier: complex_reasoning
+    question: "The compliance manual Section 14.7 requires Level 1 (CRITICAL) incidents to be reported within 1 hour. Chen received Hartwell's directive on Feb 23, 2021. She is a fiduciary with compliance obligations. By NOT reporting immediately, did Chen independently violate securities law, or was she protected as a subordinate following orders? What legal doctrine applies?"
+    requires: "compliance_manual (Section 14.7 escalation) + deposition (Chen's statements) + knowledge of respondeat superior + aiding/abetting liability"
+    answer: |
+      Multiple legal doctrines apply:
+
+      1. AIDING AND ABETTING (15 USC 78t(e)):
+         Chen's failure to report and her active approval of trades could constitute aiding and abetting
+         the primary 10b-5 violation. She had actual knowledge of the fraud.
+
+      2. "JUST FOLLOWING ORDERS" IS NOT A DEFENSE:
+         In securities law, employees cannot avoid liability by claiming they followed a superior's
+         instructions. See SEC v. Savoy Industries (employees liable for executing trades they knew
+         were manipulative).
+
+      3. BUT — CHEN HAS A COOPERATION AGREEMENT:
+         Chen entered a cooperation agreement on May 1, 2022. This likely provides:
+         - Immunity from personal enforcement action
+         - In exchange for testimony against Hartwell
+         - This is standard practice for cooperating witnesses
+
+      4. COMPLIANCE MANUAL VIOLATION ≠ SECURITIES LAW VIOLATION:
+         Failing to report internally (72-hour rule) is a compliance breach, not independently
+         a securities fraud. But APPROVING trades she knew were based on MNPI IS a 10b-5 violation.
+
+      Chen WAS independently liable but is protected by her cooperation agreement, not by the
+      "following orders" defense.
+
+  - id: L45
+    tier: complex_reasoning
+    question: "The settlement agreement releases 'all claims arising from purchases of Apex Technologies securities during the Class Period.' If an investor bought Apex OPTIONS (not stock) during the Class Period and lost money when the fraud was revealed, are they covered by this release? Parse the exact language."
+    requires: "settlement_agreement (release language, Section VII) + merger_agreement (treatment of options in Section 2.2)"
+    answer: |
+      Analysis of the release language:
+
+      The settlement covers "all claims arising from purchases of Apex Technologies SECURITIES during the Class Period."
+
+      The key word is "securities" — not "stock" or "common stock."
+
+      Under the Securities Act of 1933, Section 2(a)(1), "security" includes:
+      - Stock (common and preferred)
+      - Options (puts and calls)
+      - Any right to purchase or sell a security
+
+      Therefore: YES, options buyers are covered by the release. The settlement intentionally
+      uses the broader term "securities" rather than the narrower "common stock."
+
+      Supporting evidence:
+      - The SEC complaint itself alleges fraud involving BOTH shares (2,847,000) AND options (15,000 contracts)
+      - The expert report calculates damages including options losses
+      - The settlement's Class Period (March 1, 2021 - June 14, 2022) encompasses the options trading
+
+      An investor who bought Apex options during the Class Period IS a Settlement Class Member
+      and IS bound by the release (unless they opted out by December 15, 2024).
+
+  # --- Complex Multi-Source Calculations ---
+
+  - id: L46
+    tier: complex_reasoning
+    question: "Calculate the TOTAL cost of fraud to Hartwell personally across ALL proceedings: criminal sentence (value of prison time using federal minimum wage equivalent), criminal forfeiture, restitution, SEC personal penalty, his share of the civil settlement, and legal fees. Compare this to his estimated personal gain."
+    requires: "tbl_evt_log (sentencing: 84 months, $42M forfeiture, $89.7M restitution) + sec_complaint ($15M personal penalty) + settlement (his contribution: $72.5M) + attorney_memo (legal fees $15-25M) + form_adv (his ownership of Meridian)"
+    answer: |
+      PERSONAL COST TO HARTWELL:
+      - Prison: 84 months (7 years) — opportunity cost ~$5M+ (CEO compensation)
+      - Criminal forfeiture: $42,000,000
+      - Criminal restitution: $89,700,000
+      - SEC civil penalty (personal): $15,000,000
+      - Settlement contribution (personal): $72,500,000
+      - Legal fees (estimated): $15,000,000 - $25,000,000
+      - Career destruction: Permanent bar from securities industry
+      ESTIMATED TOTAL: $234M - $244M + 7 years imprisonment
+
+      HIS PERSONAL GAIN:
+      - As majority owner of Meridian, he likely received most of the $89.7M fund profits
+      - But profits belonged to the FUND, not personally (2%/20% fee structure per Form ADV)
+      - His actual personal take: 20% performance fee on $89.7M = ~$17.9M + 2% management fee
+      - TOTAL PERSONAL GAIN: ~$20M maximum
+
+      RATIO: Paid $234M+ and 7 years in prison for ~$20M personal gain = 12x+ personal loss/gain ratio.
+
+  - id: L47
+    tier: complex_reasoning
+    question: "The compliance officer Jennifer Walsh flagged the APEX position on March 3, 2021 (see email chain). Hartwell told her to 'mark it as resolved.' If Walsh had escalated to the Board instead of accepting Hartwell's instruction, could the entire fraud have been prevented? Calculate the exposure at that point vs. the final amount."
+    requires: "email_chain_03 (Walsh alert March 3) + trading_log (what was already bought by March 3) + sec_complaint (total 2,847,000 shares) + timeline"
+    answer: |
+      ON MARCH 3, 2021 (Walsh alert):
+      - Position was ~4.8% of AUM (~$201M per Walsh's email)
+      - Approximately 847K + 523K + 412K + 389K = ~2,171,000 shares already purchased
+      - At ~$48/share, exposure was ~$104M in capital deployed
+
+      AFTER MARCH 3 (remaining purchases):
+      - Additional ~676,000 shares purchased March 3-15
+      - Plus 15,000 option contracts (some before, some after March 3)
+
+      IF WALSH HAD ESCALATED ON MARCH 3:
+      - Board notification would have frozen trading per compliance manual
+      - Meridian would have held ~2.17M shares instead of 2.85M (24% less)
+      - Profit would have been ~$66M instead of $89.7M (still massive fraud)
+      - BUT: Early detection might have triggered internal investigation
+      - Could have led to voluntary disclosure (SEC cooperation credit)
+      - Might have avoided criminal prosecution entirely
+
+      CONCLUSION: Walsh's escalation could NOT have prevented the fraud entirely (most
+      trading was already done) but could have reduced it by ~$24M and potentially avoided
+      criminal charges through voluntary self-reporting.
+
+  - id: L48
+    tier: complex_reasoning
+    question: "The expert report estimates $17.28 per-share artificial inflation, but the settlement pays only $3.42 per damaged share. Meanwhile, the merger price was $84.00 and pre-tip price was $47.82. Reconcile ALL these numbers: Why is the per-share recovery so much lower than the per-share inflation? Account for the mathematical relationship between all figures."
+    requires: "expert_report ($17.28 inflation, 22.4M damaged shares, $412M total) + settlement ($347.5M, $3.42/share, 22.5% fees) + sec_complaint ($47.82 before) + merger_agreement ($84/share)"
+    answer: |
+      RECONCILIATION OF ALL PER-SHARE FIGURES:
+
+      1. Price movement: $47.82 → $78.50 (announcement day) → $84.00 (merger close)
+         - Total appreciation: $84.00 - $47.82 = $36.18/share
+         - Of which LEGITIMATE merger premium: $36.18 - $17.28 = $18.90/share
+         - Of which ARTIFICIAL INFLATION (fraud): $17.28/share
+
+      2. Total damages calculation:
+         - Damaged shares: 22.4 million
+         - Inflation per share: $17.28 (peak) / $18.39 (volume-weighted average)
+         - Total: 22.4M × $18.39 = ~$412M
+
+      3. Settlement math:
+         - Gross settlement: $347.5M
+         - Attorney fees (22.5%): -$78.2M
+         - Admin costs: ~-$5M
+         - Net to class: ~$264.3M
+
+      4. Per-share recovery:
+         - $264.3M / 22.4M damaged shares = $11.80/share (from expert report)
+         - BUT the $3.42 figure uses TOTAL RECOGNIZED LOSSES as denominator (larger base)
+         - $3.42 = Net fund / total recognized loss claims (not just damaged shares)
+         - This implies total recognized losses filed ≈ $264.3M / $3.42 = ~77.3M share-equivalents
+
+      5. WHY $3.42 << $17.28:
+         - Not all inflation was recoverable (some dissipated before fraud revealed)
+         - Settlement is 84.3% of damages (not 100%)
+         - 22.5% goes to attorneys
+         - Many class members filed claims for partial-period holdings
+         - The $3.42 denominator includes ALL claim filings, not just peak-inflation shares
+
+  - id: L49
+    tier: complex_reasoning
+    question: "Hartwell's attorney memo estimates 85-90% SEC win probability. The motion to dismiss was denied. Chen is cooperating. Under Federal Sentencing Guidelines for securities fraud involving $89.7M in gains, what is the EXPECTED sentence range? Does the actual 84-month sentence suggest a plea bargain discount? Show your reasoning."
+    requires: "attorney_memo (win probability) + tbl_evt_log (sentencing) + knowledge of USSG §2B1.1"
+    answer: |
+      FEDERAL SENTENCING GUIDELINES ANALYSIS (USSG §2B1.1):
+
+      Base offense level for fraud: 7
+      Loss enhancements for $89.7M:
+      - Over $65M but under $150M: +26 levels
+      Adjusted base: 33
+
+      Additional enhancements likely applicable:
+      - Sophisticated means: +2 (organized scheme, multiple entities)
+      - Leadership role (§3B1.1): +4 (organizer/leader of 5+ participants)
+      - Securities fraud specific (§2B1.1(b)(19)): +4 (officer of publicly-traded issuer's counterparty)
+      Total offense level: ~39-43
+
+      At offense level 39-43, Criminal History Category I:
+      - Level 39: 262-327 months (21.8-27.3 years)
+      - Level 43: Life
+
+      ACTUAL SENTENCE: 84 months (7 years)
+
+      DISCOUNT ANALYSIS:
+      - Guidelines range: ~262-327 months
+      - Actual: 84 months
+      - Discount: 68-74% below guidelines
+
+      This STRONGLY suggests a plea bargain with:
+      - Acceptance of responsibility (-3 levels per §3E1.1)
+      - Government motion for downward departure (cooperation with civil case)
+      - Possible Rule 35 motion if he assisted with Pacific Growth prosecution
+      - Agreement to pay $42M forfeiture + $89.7M restitution in exchange for reduced time
+
+      84 months for $89.7M fraud is a SIGNIFICANT discount, consistent with the plea
+      agreement noted in our event log (November 15, 2024).
+
+  - id: L50
+    tier: complex_reasoning
+    question: "Consider the timeline: Board Resolution 2021-047 was passed on February 15, 2021. Hartwell received the tip on February 22. The resolution authorized $200M for technology. If the resolution had NOT existed, could Hartwell have made the same trades? What alternative compliance obstacles would he have faced, and how does this affect the 'scienter' analysis?"
+    requires: "board_minutes (Resolution date Feb 15) + compliance_manual (approval thresholds) + deposition (Chen used resolution as justification) + court_opinion (scienter)"
+    answer: |
+      COUNTERFACTUAL ANALYSIS:
+
+      WITHOUT Board Resolution 2021-047:
+      - Per Section 5.3 of Compliance Manual, trades over $100M require CEO + CIO + Risk Committee
+      - A $136M purchase program would trigger multiple approval gates
+      - Each approver would ask: "Why are we suddenly buying APEX?"
+      - Without the "technology allocation" cover story, the lack of research/thesis is exposed
+      - Compliance officer would demand restricted list check AND investment committee approval
+
+      WITH Board Resolution (actual situation):
+      - Hartwell cited it as authorization ("Board authorized $200M for tech")
+      - This provided plausible cover for the first $200M
+      - Chen accepted this justification without deeper questioning
+      - Compliance officer Walsh accepted it too (initially)
+
+      IMPACT ON SCIENTER ANALYSIS:
+      - The Resolution was passed BEFORE the tip (Feb 15 vs Feb 22) — legitimate action
+      - But Hartwell's MISUSE of it to circumvent compliance IS evidence of scienter
+      - It shows PREMEDITATION — he immediately recognized the resolution as useful cover
+      - It demonstrates consciousness of guilt (knew he needed a cover story)
+      - The court opinion SHOULD cite this as additional scienter evidence
+
+      PARADOX: The resolution's existence HELPED Hartwell commit the fraud but ALSO
+      provides STRONGER evidence of scienter (he deliberately weaponized a legitimate
+      governance action to facilitate illegal trading).
+
+  # --- Contradiction Detection and Resolution ---
+
+  - id: L51
+    tier: complex_reasoning
+    question: "The SEC complaint states trading period was 'February 28, 2021 through May 30, 2022.' The settlement class period is 'March 1, 2021 through June 14, 2022.' These are DIFFERENT. Why do they differ by specific days, and what legal significance does each boundary date have?"
+    requires: "sec_complaint (trading period) + settlement_agreement (class period) + court_opinion (filing date June 15)"
+    answer: |
+      THE FOUR BOUNDARY DATES AND THEIR SIGNIFICANCE:
+
+      1. FEBRUARY 28, 2021 (SEC trading period START):
+         - First actual trade by Meridian
+         - This is when the DEFENDANTS began violating the law
+         - The SEC cares about when the FRAUD started
+
+      2. MARCH 1, 2021 (Class period START):
+         - First day INVESTORS could have been harmed
+         - Why one day later? Feb 28 was a Sunday in 2021 — wait, actually Feb 28, 2021 was a Sunday
+         - Actually: Feb 28 WAS a Sunday, so March 1 was the first TRADING DAY
+         - The class period starts when class members could have PURCHASED at inflated prices
+         - Meridian may have placed orders on Feb 28 (Sunday) for execution Monday March 1
+
+      3. MAY 30, 2022 (SEC trading period END):
+         - Last date of any scheme-related activity by defendants
+         - May include cover-up activities, obstruction, or delayed profit-taking
+
+      4. JUNE 14, 2022 (Class period END):
+         - Day BEFORE the SEC filed its complaint (June 15, 2022)
+         - The complaint filing IS the corrective disclosure
+         - After June 15, investors had the TRUE information and couldn't be defrauded
+         - Class period ends the day the artificial inflation is removed from the stock price
+
+      LEGAL SIGNIFICANCE:
+      - SEC period = scope of DEFENDANT'S misconduct (for penalties/disgorgement)
+      - Class period = scope of INVESTOR'S damages (for settlement allocation)
+      - The SEC period is BROADER because it includes pre-market activity and post-revelation cover-up
+      - The class period is defined by when investors could be INJURED (buying at inflated prices)
+
+  - id: L52
+    tier: complex_reasoning
+    question: "The Form ADV (filed March 31, 2021) states 'no prior disciplinary actions.' At that time, Meridian was ACTIVELY committing securities fraud (trading began Feb 28). Is this a SEPARATE violation (filing a false Form ADV)? What additional charges could the SEC have brought?"
+    requires: "form_adv (filing date, no discipline disclosure) + sec_complaint (trading dates) + compliance_manual + knowledge of Form ADV filing requirements"
+    answer: |
+      ANALYSIS OF POTENTIAL ADDITIONAL VIOLATIONS:
+
+      1. WAS THE FORM ADV FALSE WHEN FILED?
+         - Filed: March 31, 2021
+         - At that time, Meridian WAS committing securities fraud (since Feb 28)
+         - BUT: The Item 19 disclosure asks about DISCIPLINARY EVENTS — actions/findings by regulators
+         - As of March 31, 2021, no regulator had taken action against Meridian
+         - The statement "no prior disciplinary actions" was TECHNICALLY TRUE at filing
+         - It was NOT false — it just didn't disclose ongoing illegal CONDUCT (which isn't what the form asks)
+
+      2. HOWEVER, OTHER FORM ADV SECTIONS MAY BE FALSE:
+         - Item 8 (Methods of Analysis): If the ADV claims "quantitative screening" but trades were based on tips
+         - Item 11 (Code of Ethics): If the ADV claims compliance procedures that weren't being followed
+         - These COULD support additional charges under Section 207 of the Advisers Act
+
+      3. POTENTIAL ADDITIONAL CHARGES:
+         - Section 207 (Advisers Act): Material misstatements in Form ADV
+         - Section 206(4): Fraud by investment adviser
+         - Rule 206(4)-7: Failure to implement compliance policies
+         - 18 USC 1001: False statements to federal agency (criminal)
+
+      4. WHY THE SEC LIKELY DIDN'T PURSUE:
+         - The insider trading charges are already overwhelming
+         - Additional Form ADV charges add complexity without significant additional penalty
+         - Plea agreement likely covered all conduct in exchange for cooperation on other matters
+
+  - id: L53
+    tier: complex_reasoning
+    question: "If you were representing a class member who purchased 50,000 shares of APEX at $65.00 on March 10, 2021 and held through the merger (received $84.00/share), did they actually LOSE money? Can they still recover under the settlement? Explain the paradox."
+    requires: "settlement_agreement (allocation formula, class period) + expert_report (inflation $17.28) + merger_agreement ($84/share)"
+    answer: |
+      THE PARADOX:
+
+      ACTUAL P&L:
+      - Bought: 50,000 shares × $65.00 = $3,250,000
+      - Received at merger close: 50,000 × $84.00 = $4,200,000
+      - ACTUAL PROFIT: $950,000 (29.2% gain)
+
+      SO DID THEY LOSE MONEY? NO — they profited.
+
+      CAN THEY STILL RECOVER? YES — here's why:
+
+      THE LEGAL THEORY OF DAMAGES:
+      - At $65.00, the stock was ARTIFICIALLY INFLATED by approximately $17.28/share
+      - Without the fraud, the stock would have been trading at ~$65.00 - $17.28 = ~$47.72
+      - The investor OVERPAID by $17.28/share due to the artificial inflation
+      - Their "Recognized Loss" = (Purchase Price - True Value) × Shares
+      - Recognized Loss = ($65.00 - $47.72) × 50,000 = $864,000
+
+      THE PARADOX RESOLVED:
+      - The investor MADE money overall (because the merger delivered $84/share)
+      - But they OVERPAID for their shares due to fraud-induced inflation
+      - Without the fraud, they could have bought at ~$47.72 and STILL received $84
+      - Their ADDITIONAL profit (without fraud): ($84 - $47.72) × 50,000 = $1,814,000
+      - Instead they got: ($84 - $65) × 50,000 = $950,000
+      - LOSS DUE TO FRAUD: $1,814,000 - $950,000 = $864,000
+
+      Under the settlement allocation formula:
+      - Their Recognized Loss: $864,000
+      - Pro-rata share: $864,000 / Total Recognized Losses × Net Settlement Fund
+      - Estimated recovery: ~$3.42 × 50,000 = $171,000
+
+  - id: L54
+    tier: complex_reasoning
+    question: "The attorney work product memo states the case has an 85-90% probability of SEC prevailing. BUT the motion to dismiss was only ONE hurdle. What are ALL the remaining litigation milestones between the MTD denial and trial, and what is the CUMULATIVE probability of the SEC winning at each stage? Explain why the single 85-90% figure may be misleading."
+    requires: "attorney_memo (85-90% assessment) + court_opinion (MTD denied) + tbl_evt_log (all events) + knowledge of federal litigation procedure"
+    answer: |
+      REMAINING LITIGATION MILESTONES AFTER MTD DENIAL:
+
+      1. DISCOVERY (completed by mid-2023):
+         - Risk: Defendants could find exculpatory evidence — LOW risk given cooperating witness
+         - Survival probability: ~95%
+
+      2. CLASS CERTIFICATION (granted Sept 15, 2023):
+         - Risk: Class could be denied (would reduce settlement leverage) — MEDIUM
+         - Survival probability: ~80% (but was GRANTED, so this hurdle passed)
+
+      3. SUMMARY JUDGMENT (denied May 22, 2024):
+         - Risk: Court could grant partial SJ on some claims — MEDIUM
+         - Survival probability: ~70-80% (of FULL denial, which occurred)
+
+      4. DAUBERT MOTIONS (expert challenges):
+         - Risk: Expert damages testimony excluded — LOW (Patterson is credible)
+         - Survival probability: ~90%
+
+      5. TRIAL:
+         - Risk: Jury or judge could find for defendants — LOW given evidence
+         - SEC win probability at trial: ~90% (given MTD denied + class cert + no SJ)
+
+      CUMULATIVE PROBABILITY (multiplied):
+      - At time of attorney memo (post-filing, pre-MTD): 0.95 × 0.80 × 0.75 × 0.90 × 0.90 = ~46%
+      - At time of settlement (post-MTD, post-class cert, post-SJ denial): 0.90 × 0.90 = ~81%
+
+      WHY 85-90% IS MISLEADING:
+      - The memo's figure is the TRIAL win probability (single stage)
+      - But the CUMULATIVE probability of reaching trial AND winning is much lower
+      - Many cases settle precisely because BOTH sides face compounding uncertainty
+      - The actual settlement at 84.3% of damages reflects the POST-MTD/class-cert/SJ probability (~81%)
+
+  - id: L55
+    tier: complex_reasoning
+    question: "The SEC filed on June 15, 2022. Criminal charges filed August 3, 2022. Class action filed January 18, 2023. The settlement was reached August 1, 2024. Construct the complete parallel proceedings timeline and explain why the SEC filed BEFORE the criminal case. What strategic advantage does this sequencing provide?"
+    requires: "tbl_evt_log (all dates) + tbl_case_mstr (all 3 cases) + knowledge of parallel proceedings strategy"
+    answer: |
+      COMPLETE PARALLEL PROCEEDINGS TIMELINE:
+
+      2022-01-10: SEC opens investigation (confidential)
+      2022-05-01: Chen cooperation agreement signed
+      2022-06-15: SEC CIVIL complaint filed (SDNY-2022-CIV-04851)
+      2022-06-16: Emergency asset freeze ordered
+      2022-08-03: CRIMINAL indictment filed (SDNY-2022-CRM-01247) — 49 days later
+      2022-09-15: MTD filed (civil)
+      2023-01-08: MTD denied (civil)
+      2023-01-18: CLASS ACTION filed (SDNY-2023-CIV-00892) — private plaintiffs follow SEC
+      2023-04-12: Chen deposition (civil)
+      2023-06-01: Class certification motion
+      2023-08-20: Expert report filed
+      2023-09-15: Class certified
+      2024-02-15: Summary judgment motion
+      2024-05-22: Summary judgment denied
+      2024-08-01: SETTLEMENT reached ($347.5M)
+      2024-11-15: Hartwell PLEA AGREEMENT (criminal)
+      2024-12-15: Opt-out deadline
+      2025-02-28: Settlement final approval
+      2025-03-20: Hartwell SENTENCED (84 months)
+
+      WHY SEC FILED FIRST (before criminal):
+
+      1. LOWER BURDEN OF PROOF: SEC needs preponderance (>50%), criminal needs beyond reasonable doubt (~95%)
+      2. ASSET FREEZE: Civil action allows emergency asset freeze (prevent dissipation) — criminal can't freeze as quickly
+      3. DISCOVERY ADVANTAGES: Civil discovery is broader than criminal (depositions, interrogatories)
+      4. COOPERATION LEVERAGE: Civil case provides additional pressure for plea negotiation
+      5. NO FIFTH AMENDMENT PROBLEM: In the civil case, SEC can draw adverse inference from silence (unlike criminal)
+      6. PARALLEL PROCEEDING DOCTRINE: SEC civil case creates record that DOJ can use
+      7. SPEED: Civil complaints require less grand jury process than indictments
+
+      STRATEGIC SEQUENCING:
+      - SEC goes first → freezes assets → obtains civil discovery
+      - DOJ follows with criminal → uses SEC's work product and discovery
+      - Private class action follows both → piggybacks on SEC findings ("fraud on the market")
+      - Settlement leverages ALL three proceedings simultaneously
+
+  - id: L56
+    tier: complex_reasoning
+    question: "Chen's cooperation agreement was signed May 1, 2022. She testified at deposition April 12, 2023. Under Evidence Rule 801(d)(2), is her deposition testimony admissible against Hartwell at trial? What about her emails? Analyze the hearsay issues for each piece of evidence."
+    requires: "deposition (testimony content) + email_chains (statements) + knowledge of Federal Rules of Evidence"
+    answer: |
+      HEARSAY ANALYSIS FOR EACH EVIDENCE TYPE:
+
+      1. CHEN'S DEPOSITION TESTIMONY (April 12, 2023):
+         - Hearsay? Potentially yes — out-of-court statement offered for truth
+         - EXCEPTION — Fed.R.Evid. 801(d)(2)(E): Statement of co-conspirator during and in furtherance of conspiracy
+         - EXCEPTION — Fed.R.Evid. 801(d)(1)(A): Prior inconsistent statement under oath (if she changes story)
+         - EXCEPTION — Fed.R.Evid. 804(b)(1): Former testimony (if Chen unavailable at trial)
+         - MOST LIKELY: Admissible as cooperating witness LIVE testimony (not hearsay if she testifies at trial)
+         - If she testifies live, deposition is only used for impeachment
+
+      2. HARTWELL'S EMAILS TO CHEN:
+         - "Move on APEX immediately, before Thursday announcement"
+         - "Skip the compliance BS, we need to move before it's public"
+         - Hearsay? NO — Fed.R.Evid. 801(d)(2)(A): Opposing party's own statement
+         - These are ADMISSIONS BY PARTY-OPPONENT — automatically admissible against Hartwell
+         - This is the STRONGEST evidence and faces zero hearsay obstacles
+
+      3. CHEN'S EMAILS (her replies):
+         - "I want to flag that this feels wrong"
+         - Hearsay? YES, if offered against Hartwell (it's HER statement, not his)
+         - EXCEPTION: 801(d)(2)(E) — co-conspirator statement during conspiracy
+         - BUT: Chen's statement AGAINST the conspiracy (expressing doubt) may not qualify
+         - Likely admissible as: present sense impression (803(1)) or state of mind (803(3))
+
+      4. HARTWELL'S EMAIL TO PACIFIC GROWTH:
+         - "Don't wait on APEX. Next 2 weeks will be very interesting."
+         - Against Hartwell: 801(d)(2)(A) — his own statement. Admissible.
+         - Against Pacific Growth: 801(d)(2)(E) — co-conspirator. Admissible IF conspiracy proven.
+
+      BOTTOM LINE: Hartwell's own emails are automatically admissible (party admissions).
+      Chen's testimony is admissible if she testifies live. The defense has NO viable
+      hearsay objection to the core evidence.
+
+  - id: L57
+    tier: complex_reasoning
+    question: "Assume the settlement fund of $347.5M is invested at 4% annual return during the claims administration period (August 2024 to June 2025 — approximately 10 months). How much interest accrues? The settlement says the fund goes to an escrow. Who gets the interest — the class or the defendants? What does the settlement agreement typically say about this?"
+    requires: "settlement_agreement (escrow, fund administration) + calculation"
+    answer: |
+      INTEREST CALCULATION:
+      - Principal: $347,500,000
+      - Rate: 4% annual
+      - Period: ~10 months (Aug 2024 to June 2025) = 10/12 year
+      - Interest: $347,500,000 × 0.04 × (10/12) = $11,583,333
+
+      So approximately $11.6 million in interest accrues.
+
+      WHO GETS THE INTEREST:
+      - Under standard class action settlement practice, interest earned on the
+        settlement fund BECOMES PART OF the settlement fund
+      - The settlement agreement typically states the "Settlement Fund" includes
+        "all interest or income earned thereon"
+      - This means the $11.6M goes to the CLASS (increases the Net Settlement Fund)
+
+      LEGAL BASIS:
+      - The fund is held in a "Qualified Settlement Fund" (QSF) under IRC § 468B
+      - A QSF is treated as a separate tax entity
+      - Interest is taxable to the fund (not to defendants or plaintiffs until distributed)
+      - Tax on the interest (~$2.9M at corporate rate) is paid FROM the fund
+      - Net additional to class: ~$8.7M ($11.6M - $2.9M tax)
+
+      IMPACT ON PER-SHARE RECOVERY:
+      - Net settlement fund increases from ~$264M to ~$273M
+      - Per-share recovery increases from $3.42 to approximately $3.53
+
+  - id: L58
+    tier: complex_reasoning
+    question: "The merger agreement has a breakup fee of $125M. The MAE threshold is $75M. Meridian's insider trading caused 'artificial inflation' of $17.28/share on ~22.4M shares = ~$387M in total artificial market impact. Could Global Systems have argued that Meridian's fraud constituted a 'Material Adverse Effect' that allowed them to walk away from the merger? Why didn't they?"
+    requires: "merger_agreement (MAE definition, breakup fee, carve-outs) + expert_report (inflation) + timeline (merger closed Sept 2021, fraud revealed June 2022)"
+    answer: |
+      COULD GLOBAL SYSTEMS HAVE INVOKED THE MAE CLAUSE?
+
+      THRESHOLD TEST:
+      - MAE threshold: $75M or 15% of net assets (whichever is less)
+      - Artificial inflation caused: $387M market impact
+      - $387M >> $75M → EXCEEDS the dollar threshold
+
+      BUT THE MAE CARVE-OUTS (from merger agreement Article X, Section 10.1):
+      The definition EXCLUDES:
+      (i) changes in general economic conditions
+      (ii) changes in the industry
+      (iii) changes in GAAP
+      (iv) natural disasters/war
+      (v) pandemics
+      (vi) failure to meet projections
+      (vii) THE ANNOUNCEMENT OF THIS MERGER ← KEY
+      (viii) actions at Parent's request
+
+      ANALYSIS:
+      - Insider trading BY A THIRD PARTY (Meridian) is NOT in the carve-out list
+      - It's not a "general economic condition" or "industry change"
+      - It's arguably a change in the "business" of Apex (reputational harm, regulatory scrutiny)
+      - Global Systems MIGHT have had a colorable MAE argument
+
+      WHY THEY DIDN'T INVOKE IT:
+      1. TIMING: The merger CLOSED on September 22, 2021. The fraud wasn't revealed until
+         January 2022 (SEC investigation) and June 2022 (complaint). By then, the merger
+         was already done — MAE can only be invoked BEFORE closing.
+
+      2. THEY DIDN'T KNOW: Global Systems had no reason to know about Meridian's trading
+         before the merger closed. The fraud was in APEX's stock, but it didn't affect
+         APEX's underlying business (the MAE is about the TARGET's business health).
+
+      3. WRONG DIRECTION: The fraud made Apex's stock go UP (not down). MAE clauses
+         protect the acquirer from the target's value DECLINING. Artificial inflation
+         actually made the $84/share price look more reasonable, not less.
+
+      CONCLUSION: Global Systems could NOT have used the MAE clause because (a) the fraud
+      wasn't discovered until after closing, (b) it didn't affect Apex's underlying business,
+      and (c) the fraud caused inflation (not decline) in value.
+
+  - id: L59
+    tier: complex_reasoning
+    question: "The SEC investigation was opened January 10, 2022 based on a FINRA referral. Chen's cooperation agreement was May 1, 2022. Between January and May, what was likely happening procedurally? Reconstruct the probable investigative steps using the SEC investigation notes, the enforcement manual, and standard SEC practice."
+    requires: "sec_investigation_file_notes (timeline) + knowledge of SEC enforcement process + compliance_manual (document retention)"
+    answer: |
+      PROBABLE INVESTIGATIVE TIMELINE (January - May 2022):
+
+      JANUARY 2022:
+      Week 1-2: SEC receives FINRA referral, opens Matter Under Inquiry (MUI)
+      Week 3: Staff reviews FINRA surveillance data showing anomalous APEX trading
+      Week 4: Formal Order of Investigation (FOI) authorized by Division Director
+      - FOI grants subpoena power
+
+      FEBRUARY 2022:
+      Week 1: Subpoenas issued to:
+        - Meridian Capital (all APEX trading records, communications, compliance files)
+        - Goldman Sachs (prime broker records for Meridian accounts)
+        - CBOE/options exchanges (option trading records)
+        - Phone companies (call records for Hartwell)
+      Week 2-4: Begin receiving Blue Sheet data (trade-by-trade records)
+      - Staff analysts map the trading pattern
+      - Identify temporal correlation: tip date → first trade → announcement
+
+      MARCH 2022:
+      - Receive document production from Meridian (2.4 million pages per investigation notes)
+      - Key discovery: Hartwell-Chen email chain found
+      - Begin witness interviews (non-target employees first)
+      - Parallel: coordinate with DOJ/FBI for potential criminal referral
+
+      APRIL 2022:
+      - Chen's personal attorney contacts SEC (proffer session)
+      - "Queen for a day" proffer: Chen tells her story without it being used against her
+      - SEC evaluates cooperation value: VERY HIGH (direct witness to tip + compliance failures)
+      - Draft cooperation agreement circulated
+      - Begin preparing civil complaint
+
+      MAY 2022:
+      - May 1: Cooperation agreement formalized
+      - Chen provides sworn declaration
+      - SEC finalizes complaint
+      - Coordinate with DOJ on timing (SEC files first for asset freeze)
+      - Prepare TRO/asset freeze application
+
+      KEY PROCEDURAL STEPS (per SEC Enforcement Manual):
+      1. MUI → FOI (formal authorization)
+      2. Subpoenas → Blue Sheets → Document production
+      3. Witness interviews (ascending order of culpability)
+      4. Proffer sessions with potential cooperators
+      5. Wells Notice (opportunity to respond before charges) — likely sent April-May 2022
+      6. Authorization memo to Commission for filing
+      7. Complaint filed + emergency relief (asset freeze)
+
+  - id: L60
+    tier: complex_reasoning
+    question: "Construct a complete 'but-for' damages analysis: In a world where Meridian never traded (no insider trading occurred), what would have happened to Apex's stock price? Would the merger still have closed? Would investors have been better or worse off? Calculate the counterfactual outcome for a hypothetical investor who bought 10,000 shares on March 5, 2021."
+    requires: "expert_report (inflation analysis) + merger_agreement ($84/share, closing) + sec_complaint (price data) + settlement (damages formula)"
+    answer: |
+      COUNTERFACTUAL ("BUT-FOR") WORLD — NO INSIDER TRADING:
+
+      STOCK PRICE PATH WITHOUT FRAUD:
+      - Pre-tip (Feb 22): ~$47.82
+      - Without Meridian's buying pressure: stock stays at ~$47-48 until announcement
+      - March 15 announcement: stock jumps to merger price area (~$80-84)
+      - Merger close (Sept 22): shareholders receive $84.00
+
+      WITH FRAUD (ACTUAL):
+      - Pre-tip: $47.82
+      - Meridian buying (Feb 28-March 15): stock rises to ~$55-65 BEFORE announcement (due to demand pressure)
+      - March 15 announcement: stock jumps to $78.50 (but from higher base)
+      - Merger close: $84.00
+
+      HYPOTHETICAL INVESTOR: Buys 10,000 shares on March 5, 2021
+
+      ACTUAL WORLD:
+      - Purchase price on March 5: approximately $55.00 (inflated by ~$7-8 from Meridian's buying)
+      - Cost: 10,000 × $55 = $550,000
+      - Received at merger: 10,000 × $84 = $840,000
+      - Actual profit: $290,000
+
+      BUT-FOR WORLD:
+      - Purchase price on March 5 (no fraud): approximately $47.82
+      - Cost: 10,000 × $47.82 = $478,200
+      - Received at merger: 10,000 × $84 = $840,000
+      - But-for profit: $361,800
+
+      DAMAGES = But-for profit - Actual profit = $361,800 - $290,000 = $71,800
+      OR equivalently: Overpayment = $55.00 - $47.82 = $7.18/share × 10,000 = $71,800
+
+      WOULD THE MERGER STILL HAVE CLOSED?
+      - YES — Meridian's trading didn't affect the MERGER ITSELF
+      - Global Systems was acquiring APEX for its technology, not its stock price
+      - The merger consideration ($84/share) was set by negotiation, not market price
+      - Without insider trading, the stock would have jumped MORE on announcement day
+        (from $47.82 to $78.50+ instead of from $55+ to $78.50)
+
+      SETTLEMENT RECOVERY:
+      - Investor's Recognized Loss: $71,800
+      - Pro-rata recovery: $71,800 / $412,000,000 × $264,312,500 = ~$46,000
+      - Net position: Kept $290,000 profit from merger + $46,000 settlement = $336,000 total gain
+      - vs. But-for: Would have gained $361,800
+      - REMAINING UNCOMPENSATED LOSS: $361,800 - $336,000 = $25,800 (~36% unrecovered)
