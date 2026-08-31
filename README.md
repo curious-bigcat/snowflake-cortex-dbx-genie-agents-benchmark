@@ -1,63 +1,54 @@
-# Cortex Agent Benchmark
+# Cortex Agent vs Cloud PaaS AI — Benchmark
 
-Comparative benchmark of **Snowflake Cortex Agents** vs **Databricks Genie** on a 12-question legal analytics workload.
+Comparative benchmark of **Snowflake Cortex Agents** vs a **cloud PaaS data platform's AI offering** on a 12-question legal analytics workload.
 
 All data is synthetic, built around a single complex securities fraud case: *SEC v. Meridian Capital Group LLC*. Tables, documents, and questions reference the same entities, enabling genuine cross-source reasoning tests.
 
+The legal domain is a sample — any complex, multi-source dataset would surface the same architectural differences.
+
 ## Results Summary
 
-| Metric | Snowflake Cortex | Databricks Genie |
-|--------|-----------------|-----------------|
+| Metric | Snowflake Cortex | Cloud PaaS AI |
+|--------|-----------------|---------------|
 | Accuracy | 12/12 (100%) | 11/12 (92%) |
 | Avg Latency | 37s | 100s |
+| Max Latency | 63s | 237s |
 | Token Cost | $3.28 | $14.40 |
 | Cost per Correct Answer | $0.27 | $1.31 |
 
+Cortex was **2.7x faster**, **77% cheaper**, and **more accurate**.
+
 Cost estimated at Anthropic Claude Sonnet published rates ($3/$15 per MTok).
+
+## Key Findings
+
+- **Architecture:** Cortex runs a single agent with parallel tool invocation (Cortex Analyst + Cortex Search simultaneously). The competing platform uses a supervisor that routes to sub-agents sequentially, averaging 3.8 tool calls per question with ~40% of SQL calls returning empty results.
+- **Cost:** Similar total token volume (~3M), but Cortex benefits from 85% prompt caching at a 90% discount. The competing platform bills every token at full rate.
+- **Accuracy:** The competing platform failed on a complex join query — it truncated a 4,992-row result set to 1,000 rows and hallucinated values not present in the returned data.
 
 ## Repository Structure
 
 ```
-cortex-agent-benchmark/
-├── data_generator/
-│   ├── universe.py                    # Master entity registry
-│   ├── generate_legal_tables.py       # Generates 12 parquet tables (1.39M rows)
-│   ├── generate_legal_docs.py         # Generates 8 text documents (~4K pages)
-│   └── generate_case_notes.py         # Generates case note documents
-├── data/legal/
-│   ├── tables/                        # 12 parquet files
-│   └── docs/                          # Text files + case notes + regulation PDFs
-├── questions/
-│   ├── legal_test_suite.yaml          # Full 60-question test suite (all tiers)
-│   └── benchmark_queries.md           # 12 benchmark questions with run instructions
+cortex-genie-agent-benchmark/
 ├── config/
 │   ├── cortex_agent/
 │   │   ├── legal_setup_guide.md       # Snowflake setup (tables + Cortex Search + Agent)
 │   │   └── legal_semantic_model.yaml  # Semantic model with code definitions
 │   └── genie_agent/
-│       └── legal_setup_guide.md       # Databricks setup (raw schema, no hints)
-├── reports/
-│   ├── generate_charts.py             # Chart generation script (matplotlib)
-│   └── benchmark_comparison.md        # Full written report
+│       └── legal_setup_guide.md       # Competing platform setup
+├── data/legal/
+│   ├── tables/                        # 12 parquet files (1.39M rows)
+│   └── docs/                          # Text files + case notes + regulation PDFs
+├── questions/
+│   ├── benchmark_queries.md           # 12 benchmark questions with run instructions
+│   └── legal_test_suite.yaml          # Full 60-question test suite (all tiers)
+├── .gitignore
 └── README.md
 ```
 
 ## Quick Start
 
-### 1. Generate the data
-
-```bash
-pip install faker pandas numpy pyarrow
-python data_generator/generate_legal_tables.py
-python data_generator/generate_legal_docs.py
-python data_generator/generate_case_notes.py
-```
-
-This produces:
-- `data/legal/tables/` — 12 parquet files (1.39M rows total)
-- `data/legal/docs/` — text documents and case notes
-
-### 2. Set up Snowflake Cortex Agent
+### 1. Set up Snowflake Cortex Agent
 
 Follow `config/cortex_agent/legal_setup_guide.md`. Key steps:
 
@@ -76,17 +67,17 @@ CREATE OR REPLACE STAGE legal_data_stage FILE_FORMAT = (TYPE = PARQUET);
 
 The Cortex Agent gets a **semantic model** that decodes all coded columns (`PLF` = Plaintiff, `MTD` = Motion to Dismiss, etc.) and defines table relationships.
 
-### 3. Set up Databricks Genie
+### 2. Set up the competing platform
 
 Follow `config/genie_agent/legal_setup_guide.md`. Key steps:
 
-- Load parquet files into Unity Catalog tables
-- Upload documents to a UC Volume
-- Create a Genie Space pointing at the tables
+- Load parquet files into the platform's catalog
+- Upload documents to a storage volume
+- Create an AI agent pointing at the tables
 
-Genie gets **raw schema only** — no column descriptions, no code mappings. It must infer meaning from data patterns.
+The competing platform gets **raw schema only** — no column descriptions, no code mappings. It must infer meaning from data patterns.
 
-### 4. Run the benchmark
+### 3. Run the benchmark
 
 See `questions/benchmark_queries.md` for the 12 questions and how to run them on each platform.
 
@@ -98,7 +89,7 @@ SELECT SNOWFLAKE.CORTEX.DATA_AGENT_RUN(
 );
 ```
 
-**Databricks:** Send the same questions through the Genie Space UI or API.
+**Competing platform:** Send the same questions through the platform's agent UI or API.
 
 ## Dataset
 
@@ -136,15 +127,6 @@ Regulations (6 PDFs): CFR Title 17/18, Federal Rules of Civil Procedure, SEC Enf
 | Noise Filtering | 3 | Find 3 needles in 50K cases |
 | Model Reasoning | 2 | Legal doctrine + probability reasoning |
 | Hybrid Doc + SQL | 2 | Retrieve doc facts, then query tables |
-
-## Generating Report Charts
-
-```bash
-pip install matplotlib numpy
-python reports/generate_charts.py
-```
-
-Outputs 8 PNG charts to `reports/charts/`.
 
 ## License
 
