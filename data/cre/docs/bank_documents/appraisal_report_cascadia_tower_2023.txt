@@ -1,0 +1,71 @@
+JONES LANG LASALLE
+COMMERCIAL PROPERTY APPRAISAL REPORT
+
+Appraisal ID: APR-0000847
+Property: Cascadia Tower, 1200 SW Main St, Portland, OR 97205
+Client: Pacific Northwest Bank, Attn: Commercial Real Estate Division
+Effective Date of Appraisal: September 15, 2023
+Purpose: Portfolio reappraisal per OCC examination requirement
+
+APPRAISED VALUE: $78,000,000
+
+Previous Appraisal (January 15, 2021): $131,000,000
+Change: -$53,000,000 (-40.5%)
+
+1. MARKET CONDITIONS
+
+The Portland CBD office market has experienced significant deterioration since our 2021
+valuation. Key market metrics:
+
+- Portland CBD Office Vacancy Rate: 31.2% (Q3 2023), up from 11.8% (Q4 2020)
+- Average Class A Asking Rent: $32.50/SF (Q3 2023), down from $41.75/SF (Q4 2020), a 22.1% decline
+- Net Absorption (2023 YTD): Negative 1.8 million SF across Portland metro
+- New Supply: 650,000 SF delivered in 2022-2023, further pressuring vacancy
+
+The primary driver is the shift to hybrid and remote work models, accelerated by the
+2023 Pacific Northwest tech sector layoffs. Major employers including Apex Technologies,
+Intel, and Nike have all reduced their Portland office footprints.
+
+2. PROPERTY-SPECIFIC CHANGES
+
+Cascadia Tower occupancy has declined from 94.2% to 38.0%:
+
+- Apex Technologies (anchor tenant): Exercised early termination clause in June 2023,
+  vacating floors 15-28 (147,000 SF). Termination penalty of $4.2M was paid but does not
+  offset the lost rental income of approximately $6.2M annually.
+- Pacific Growth Capital: Reduced footprint from 63,000 SF to 31,500 SF (floors 32-33 only).
+  Lease expires December 2026 with no renewal commitment.
+- Three smaller tenants (combined 42,000 SF) vacated at lease expiry in Q1-Q2 2023.
+- Current occupied SF: 161,500 SF (38.0% occupancy)
+
+3. VALUATION METHODOLOGY
+
+We employed three approaches:
+
+a) Income Approach (Primary): $78,000,000
+   - Current NOI: $4,100,000 (annualized from Q3 2023 actual)
+   - Stabilized NOI (projected): $6,800,000 (assumes gradual lease-up to 65% over 3 years)
+   - Cap Rate: 7.25% (reflecting current market risk premium for CBD office)
+   - Discounted Cash Flow (10-year): $78,200,000
+
+b) Sales Comparison: $74,000,000
+   - Three comparable sales: Pioneer Courthouse Square ($185/SF, June 2023),
+     Lloyd Center Tower ($165/SF, April 2023), Morrison Bridge Plaza ($178/SF, August 2023)
+   - Adjusted average: $174/SF x 425,000 SF = $73,950,000
+
+c) Cost Approach: $95,000,000
+   - Replacement cost less depreciation (not relied upon due to market disconnect)
+
+RECONCILED VALUE: $78,000,000 (weighted: 60% income, 30% sales, 10% cost)
+
+4. LOAN-TO-VALUE IMPACT
+
+Current Loan Balance: $78,500,000
+Appraised Value: $78,000,000
+Current LTV: 100.6% (EXCEEDS 75% covenant and 80% regulatory threshold)
+
+This appraisal indicates the loan is underwater. We recommend immediate risk management
+review and consideration of workout options.
+
+Appraiser: Margaret Sullivan, MAI, Jones Lang LaSalle (APR-001)
+Review Status: APPROVED by internal review committee

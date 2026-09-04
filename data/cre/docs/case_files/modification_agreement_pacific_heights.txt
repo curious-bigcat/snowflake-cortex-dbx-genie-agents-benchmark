@@ -1,0 +1,51 @@
+LOAN MODIFICATION AGREEMENT
+
+Date: October 25, 2023
+Loan Number: CRE-2021-01089
+Lender: Pacific Northwest Bank
+Borrower: Pacific Heights Partners LP
+
+RECITALS
+
+WHEREAS, Lender made a loan to Borrower in the original principal amount of $28,000,000
+(the "Loan") pursuant to a Loan Agreement dated April 10, 2021;
+
+WHEREAS, the Loan is secured by a first-priority deed of trust on Pacific Heights Apartments,
+a 180-unit multifamily property located at 1500 NW 23rd Ave, Portland, OR 97210;
+
+WHEREAS, Borrower has requested modification of certain terms of the Loan due to
+increased operating costs and softening rental market conditions;
+
+MODIFICATION TERMS
+
+1. INTEREST RATE: Reduced from 5.750% to 4.250% fixed for 24 months (effective
+   November 1, 2023 through October 31, 2025), then reverting to 5.750%.
+
+2. MATURITY DATE: Extended from April 10, 2028 to April 10, 2030 (2-year extension).
+
+3. PRINCIPAL PAYDOWN: Borrower shall make a one-time principal payment of $2,000,000
+   within 30 days of execution of this Agreement, reducing the outstanding balance
+   from $26,200,000 to $24,200,000.
+
+4. MODIFIED COVENANTS:
+   - DSCR minimum: 1.15x (reduced from 1.30x) for 12 months, then 1.25x
+   - LTV maximum: 80% (unchanged)
+   - Occupancy minimum: 85% (reduced from 90%)
+
+5. ADDITIONAL PROVISIONS:
+   - Cash sweep: 50% of excess cash flow applied to principal until balance reaches $22,000,000
+   - Monthly reporting: Borrower to provide monthly rent roll and operating statement
+   - No additional debt: Borrower may not incur additional secured debt on the property
+
+PROPERTY STATUS:
+Current Occupancy: 91.2%
+Current NOI (annualized): $1,850,000
+Current Appraised Value: $33,500,000
+Current LTV: 72.2% (post-paydown)
+Modified DSCR: 1.52x (at modified rate)
+
+IN WITNESS WHEREOF, the parties have executed this Agreement.
+
+PACIFIC NORTHWEST BANK                PACIFIC HEIGHTS PARTNERS LP
+By: _________________________         By: _________________________
+    Robert J. Hartwell, CCO               James Anderson, General Partner

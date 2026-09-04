@@ -1,0 +1,84 @@
+PACIFIC NORTHWEST BANK
+CREDIT RISK MANAGEMENT
+
+ANNUAL CREDIT RISK REVIEW — 2023
+
+Date: December 31, 2023
+Prepared by: David Park, Chief Risk Officer
+
+1. PORTFOLIO OVERVIEW
+
+Total Loans: $15.6 billion
+CRE Portfolio: $8.7 billion (55.8% of total loans)
+
+CRE BY PROPERTY TYPE:
+Property Type    Balance ($M)    % of CRE    % of Capital
+Office           $3,850          44.3%       185%
+Multifamily      $2,100          24.1%       101%
+Retail           $980            11.3%       47%
+Industrial       $870            10.0%       42%
+Hotel            $450            5.2%        22%
+Land             $350            4.0%        17%
+TOTAL CRE        $8,700          100%        420%
+
+2. CRE OFFICE PORTFOLIO — RISK RATING MIGRATION
+
+The CRE office portfolio has experienced dramatic deterioration in credit quality:
+
+Risk Rating      YE 2021    YE 2022    YE 2023    Change (2021-2023)
+1-PASS           28%        18%        8%         -20pp
+2-PASS           38%        28%        15%        -23pp
+3-SM             18%        22%        18%        +0pp
+4-SM             10%        15%        25%        +15pp
+5-SS             4%         10%        18%        +14pp
+6-SUB            1.5%       5%         10%        +8.5pp
+7-DBT            0.4%       1.5%       4%         +3.6pp
+8-LOSS           0.1%       0.5%       2%         +1.9pp
+Special Mention+ 6%         17%        34%        +28pp
+
+34% of the CRE office portfolio is now rated Special Mention (5-SS) or worse,
+compared to just 6% at year-end 2021. This represents a complete inversion of
+the portfolio's risk profile.
+
+3. NON-PERFORMING LOANS
+
+                      YE 2021    YE 2022    YE 2023    Change
+Non-Accrual Loans     $45M       $187M      $1,200M    +$1,155M
+Past Due 90+ Days     $12M       $95M       $680M      +$668M
+Total Non-Performing  $57M       $282M      $1,880M    +$1,823M
+NPL Ratio             0.4%       1.8%       12.1%      +11.7pp
+
+4. CHARGE-OFFS
+
+                      2021       2022       2023       Total
+Gross Charge-offs     $8M        $12M       $87M       $107M
+Recoveries            $3M        $2M        $5M        $10M
+Net Charge-offs       $5M        $10M       $82M       $97M
+NCO Rate              0.03%      0.06%      0.53%      0.21%
+
+2023 charge-offs are dominated by CRE office ($62M of $87M gross), including
+$16.5M for Cascadia Tower and $8.2M for three other individual credits.
+
+5. TOP 10 WATCH LIST CREDITS
+
+Rank  Loan ID            Borrower                 Balance    Rating  Status
+1     CRE-2021-00847     Cascadia Holdings LLC    $78.5M     7-DBT   WKOT
+2     CRE-2020-01205     Puget Industrial LLC     $30.1M     8-LOSS  FCLS
+3     CRE-2022-00456     Cedar Point Ventures     $18.4M     6-SUB   NACC
+4     CRE-2021-02100     Bellevue Gateway JV      $38.5M     4-SM    ACTV
+5     CRE-2021-01089     Pacific Heights Partners  $26.2M    5-SS    ACTV
+6     CRE-2022-01834     Pioneer Properties REIT  $42.0M     5-SS    DLQ30
+7     CRE-2021-03456     Fremont Tech Realty       $31.5M    6-SUB   DLQ60
+8     CRE-2022-02100     Capitol Hill Investments  $28.0M    5-SS    ACTV
+9     CRE-2020-04200     Ballard Maritime Holdings $22.0M    6-SUB   DLQ90
+10    CRE-2021-05000     Lake Union Properties LP  $19.5M    7-DBT   NACC
+
+6. OUTLOOK
+
+The CRE office portfolio will continue to deteriorate through 2024 as tenant leases
+expire without renewal. Portland CBD office vacancy is projected to reach 35-38%
+by mid-2024. The Bank's workout pipeline of $2.1 billion in distressed CRE loans
+will require 18-36 months to resolve.
+
+The capital plan and CRE concentration reduction are critical to maintaining
+adequate capitalization through the workout period.

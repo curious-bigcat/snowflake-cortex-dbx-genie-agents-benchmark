@@ -1,0 +1,64 @@
+PACIFIC NORTHWEST BANK
+CONFIDENTIAL — LOAN SALE TERM SHEET
+
+Date: January 15, 2024
+Transaction: Sale of Performing CRE Loan Pool
+Seller: Pacific Northwest Bank ("Seller")
+Buyer: Blackstone Real Estate Debt Strategies Fund VI ("Buyer")
+
+1. POOL COMPOSITION
+
+Total Pool UPB: $412,000,000
+Number of Loans: 187
+Weighted Average Coupon: 4.85%
+Weighted Average Remaining Term: 4.2 years
+Weighted Average LTV (current): 72.3%
+Weighted Average DSCR: 1.38x
+
+Property Type Mix:
+- Office: 35% ($144M, 65 loans)
+- Multifamily: 28% ($115M, 52 loans)
+- Retail: 18% ($74M, 34 loans)
+- Industrial: 12% ($49M, 22 loans)
+- Hotel: 7% ($29M, 14 loans)
+
+Geographic Mix:
+- Oregon: 42%
+- Washington: 38%
+- Idaho: 12%
+- Other: 8%
+
+Risk Rating Distribution:
+- 1-PASS through 3-SM: 100% (performing pool, no classified loans)
+
+2. PRICING
+
+Purchase Price: 92 cents on the dollar
+Total Purchase Price: $379,040,000
+Implied Loss to Seller: $32,960,000 (8.0%)
+
+3. KEY TERMS
+
+- Closing: On or before March 15, 2024
+- Due Diligence Period: 45 days from execution
+- Deposit: 2% ($7,580,800) non-refundable after due diligence period
+- Servicing: Seller retains servicing for 90 days post-closing, then transfers to Buyer's servicer
+- Representations: Standard commercial loan sale reps (no recourse post-close)
+- Breakage: If Buyer fails to close, deposit forfeited; if Seller fails, $15M liquidated damages
+
+4. RATIONALE
+
+This sale is part of PNB's Capital Plan submitted to the OCC under Consent Order 2023-CE-0847.
+The sale will:
+- Reduce CRE concentration by approximately $412M (from $8.7B to $8.3B)
+- Reduce CRE-to-capital ratio from 420% to approximately 400%
+- Release approximately $33M of risk-weighted assets (net of loss)
+- Improve CET1 ratio by approximately 0.4% (net of loss recognition)
+
+5. SELLER REPRESENTATIONS
+
+Seller represents that:
+- All loans in the pool are current (0 DPD) as of the cut-off date
+- No loans are subject to pending or threatened litigation
+- All collateral has been appraised within the past 24 months
+- Environmental Phase I reports are on file for all loans with balance exceeding $5M

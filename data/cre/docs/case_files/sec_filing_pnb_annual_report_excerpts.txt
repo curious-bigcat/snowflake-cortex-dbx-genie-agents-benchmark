@@ -1,0 +1,50 @@
+PACIFIC NORTHWEST BANK HOLDING COMPANY
+EXCERPTS FROM ANNUAL REPORT (FORM 10-K)
+FOR THE FISCAL YEAR ENDED DECEMBER 31, 2023
+
+RISK FACTORS (selected)
+
+COMMERCIAL REAL ESTATE CONCENTRATION RISK
+
+A significant portion of our loan portfolio consists of commercial real estate loans.
+As of December 31, 2023, our CRE loans totaled $8.7 billion, representing approximately
+55.8% of total loans and 420% of total risk-based capital. This concentration exceeds
+the 300% threshold established in the 2006 Interagency Guidance on Concentrations in
+Commercial Real Estate Lending (SR 07-1).
+
+Our CRE office portfolio of $3.85 billion has been adversely affected by:
+- The shift to hybrid and remote work reducing office space demand
+- The 2023 Pacific Northwest technology sector contraction, which resulted in
+  significant tenant departures across our Portland and Seattle CBD office properties
+- Rising interest rates increasing borrower debt service costs
+- Cap rate expansion reducing property values
+
+As a result, 34% of our CRE office portfolio is rated Special Mention or worse, and
+non-performing CRE loans increased from $57 million at year-end 2021 to $1.88 billion
+at year-end 2023.
+
+OCC CONSENT ORDER
+
+On November 15, 2023, we entered into a Consent Order (No. 2023-CE-0847) with the
+Office of the Comptroller of the Currency. The Consent Order requires us to, among
+other things:
+- Submit a Capital Plan to maintain adequate capital ratios
+- Reduce CRE concentration below 350% of capital within 18 months
+- Suspend common stock dividends
+- Remediate all examination findings
+- Cease new CRE office originations until concentrations are reduced
+
+We are actively implementing the requirements of the Consent Order. We cannot assure
+that our remediation efforts will be completed within the required timeframes or that
+additional regulatory actions will not be taken.
+
+SELECTED FINANCIAL DATA
+
+                          2023        2022        2021
+Total Assets ($B)         $28.0       $27.5       $25.2
+Total Loans ($B)          $15.6       $15.1       $13.8
+CRE Loans ($B)            $8.7        $8.2        $6.5
+Non-Performing Loans ($M) $1,880      $282        $57
+Net Charge-Offs ($M)      $82         $10         $5
+ALLL ($M)                 $432        $295        $185
+CET1 Ratio                7.9%        10.2%       11.4%

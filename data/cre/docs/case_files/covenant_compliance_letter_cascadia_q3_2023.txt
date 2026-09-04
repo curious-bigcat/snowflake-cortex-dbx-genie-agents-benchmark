@@ -1,0 +1,62 @@
+PACIFIC NORTHWEST BANK
+1000 SW Broadway, Portland, Oregon 97205
+
+October 18, 2023
+
+Mr. David Nakamura
+Managing Member
+Cascadia Holdings LLC
+900 SW Washington St, Suite 500
+Portland, OR 97205
+
+Re: Loan No. CRE-2021-00847 — Notice of Covenant Breach
+
+Dear Mr. Nakamura:
+
+This letter constitutes formal notice that Pacific Northwest Bank ("Lender") has determined
+that the following covenants under the Loan Agreement dated February 15, 2021 (the "Agreement")
+are in breach as of the September 30, 2023 testing date:
+
+1. DEBT SERVICE COVERAGE RATIO (Section 6.2(a))
+   Required: Minimum 1.35x
+   Actual: 0.87x
+   Deficiency: 0.48x below minimum
+
+2. LOAN-TO-VALUE RATIO (Section 6.2(b))
+   Required: Maximum 75.0%
+   Actual: 100.6%
+   Deficiency: 25.6 percentage points above maximum
+
+3. OCCUPANCY RATE (Section 6.2(c))
+   Required: Minimum 80.0%
+   Actual: 38.0%
+   Deficiency: 42.0 percentage points below minimum
+
+4. NET OPERATING INCOME (Section 6.2(d))
+   Required: Minimum $6,375,000 annually
+   Actual: $4,100,000 (annualized)
+   Deficiency: $2,275,000 below minimum
+
+Pursuant to Section 7.1 of the Agreement, Borrower has thirty (30) calendar days from
+the date of this notice (cure deadline: November 17, 2023) to:
+
+(a) Cure the covenant breaches; OR
+(b) Submit to Lender a written plan acceptable to Lender demonstrating how Borrower
+    intends to restore compliance within a reasonable timeframe.
+
+Failure to cure or present an acceptable plan within the cure period will constitute an
+Event of Default under Section 8.1 of the Agreement, entitling Lender to exercise all
+remedies available under the Agreement and applicable law, including acceleration of
+the outstanding balance of $78,500,000.
+
+The Bank is prepared to discuss potential workout alternatives in good faith. Please
+contact James Chen, Senior Vice President, at (503) 555-0147 to arrange a meeting.
+
+This notice is without prejudice to any other rights or remedies of the Lender under
+the Agreement or at law.
+
+Sincerely,
+
+Robert J. Hartwell
+Chief Credit Officer
+Pacific Northwest Bank

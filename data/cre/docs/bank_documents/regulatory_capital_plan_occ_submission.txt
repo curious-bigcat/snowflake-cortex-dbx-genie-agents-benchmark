@@ -1,0 +1,90 @@
+PACIFIC NORTHWEST BANK
+CAPITAL PLAN — SUBMITTED TO THE OFFICE OF THE COMPTROLLER OF THE CURRENCY
+
+Pursuant to Consent Order No. 2023-CE-0847, Article I
+
+Submission Date: February 10, 2024 (within 90-day deadline of February 13, 2024)
+
+CONFIDENTIAL SUPERVISORY INFORMATION
+
+1. CURRENT CAPITAL POSITION (December 31, 2023)
+
+                    Amount ($M)     Ratio      Minimum Required
+CET1 Capital        $2,057          7.9%       4.5% (7.0% well-capitalized)
+Tier 1 Capital      $2,394          9.2%       6.0% (8.0% well-capitalized)
+Total Capital       $3,068          11.8%      8.0% (10.0% well-capitalized)
+Leverage Ratio                      7.3%       4.0% (5.0% well-capitalized)
+RWA                 $26,017M
+
+Note: CET1 has declined from 11.4% (YE 2021) to 7.9% (YE 2023), a 350 bps deterioration
+driven by $87M in CRE charge-offs, $95M in additional provision expense, and $56M in
+dividend payments made prior to suspension.
+
+2. CAPITAL RESTORATION ACTIONS
+
+Action 1: Subordinated Debt Issuance — $175 Million
+- Structure: 10-year non-call 5 subordinated notes
+- Coupon: 7.50% fixed
+- Placement Agents: Goldman Sachs and JPMorgan
+- Expected Closing: March 2024
+- Capital Impact: +0.67% Total Capital Ratio (qualifies as Tier 2 capital)
+- CET1 Impact: None (sub debt does not count as CET1)
+
+Action 2: Performing CRE Loan Sale — $412 Million Pool
+- Buyer: Blackstone Real Estate Debt Strategies Fund VI
+- Price: 92 cents on the dollar ($379M proceeds)
+- Loss Recognition: $33M pre-tax ($23M after tax)
+- Expected Closing: March 2024
+- CET1 Impact: +0.4% (RWA reduction of ~$400M, net of loss)
+- CRE Concentration Impact: Reduction from 420% to ~400% of capital
+
+Action 3: Risk-Weighted Asset Optimization — $200 Million
+- Reduce unfunded CRE commitments: $120M (decline letters to borrowers)
+- Government guarantee coverage on CNI loans: $50M (SBA 7(a) guarantees)
+- Securitization of residential portfolio tranche: $30M
+- Expected Timeline: Q2-Q3 2024
+- CET1 Impact: +0.2%
+
+Action 4: Dividend Suspension — Ongoing
+- Common dividend of $0.35/share suspended since Q3 2023
+- Annual capital retention: approximately $56M ($0.10 per quarter saved)
+- CET1 Impact: +0.4% per year (cumulative)
+
+Action 5: Earnings Retention
+- Projected pre-provision net revenue: $400M (2024)
+- Less: Projected provision expense: $280M (2024)
+- Net income contribution to capital: approximately $85M after tax
+- CET1 Impact: +0.3%
+
+3. PROJECTED CAPITAL TRAJECTORY
+
+              Q4 2023  Q1 2024  Q2 2024  Q3 2024  Q4 2024  Q1 2025
+              Actual   Proj     Proj     Proj     Proj     Proj
+CET1 Ratio    7.9%     8.3%     8.7%     9.0%     9.3%     9.5%
+Tier 1 Ratio  9.2%     9.6%     10.0%    10.3%    10.6%    10.8%
+Total Ratio   11.8%    12.8%    13.2%    13.5%    13.8%    14.0%
+
+Target: Restore CET1 above 9.0% by Q3 2024 (above well-capitalized + 200 bps buffer)
+
+4. STRESS SCENARIO IMPACT (with capital plan actions)
+
+Under the severe adverse scenario:
+- Pre-mitigation CET1 trough: 6.1%
+- Post-mitigation CET1 trough: 7.8%
+- Buffer above well-capitalized: 80 bps
+
+We acknowledge the buffer under severe stress is narrow. If conditions deteriorate beyond
+the severe adverse scenario, additional actions may be required, including:
+- Additional asset sales (up to $500M of performing loans identified)
+- Common equity issuance ($100-150M shelf registration to be filed)
+- Further RWA reduction through portfolio run-off
+
+5. CONCENTRATION REDUCTION PLAN
+
+              Q4 2023  Target Q2 2024  Target Q4 2024  Target Q2 2025
+CRE/Capital   420%     400%            375%            350%
+CRE Office    185%     170%            155%            140%
+New CRE Orig  N/A      Suspended       Limited         Normalized
+
+Per Article II of the Consent Order, new CRE office originations are suspended
+until office sub-concentration is below 150% of capital.

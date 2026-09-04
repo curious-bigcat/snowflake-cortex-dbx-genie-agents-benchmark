@@ -1,0 +1,77 @@
+OFFICE OF THE COMPTROLLER OF THE CURRENCY
+EXAMINER'S REPORT — CAPITAL ADEQUACY REVIEW
+
+Bank: Pacific Northwest Bank, Portland, Oregon
+Charter Number: 14892
+Examination Date: September 2023
+Examiner-in-Charge: Jonathan Blake, National Bank Examiner
+
+CAPITAL COMPONENT RATING: 3 (Less Than Satisfactory)
+
+1. CAPITAL ADEQUACY ASSESSMENT
+
+Pacific Northwest Bank's capital position has deteriorated significantly over the past
+two years, primarily driven by losses and provisions related to the CRE portfolio.
+
+Capital Ratio Trends:
+                 YE 2021    YE 2022    Q3 2023    Direction
+CET1 Ratio       11.4%      10.2%      8.1%       Declining
+Tier 1 Ratio     12.8%      11.5%      9.4%       Declining
+Total Capital    15.2%      14.0%      11.8%      Declining
+Leverage Ratio   9.8%       8.8%       7.3%       Declining
+
+The 330 basis point decline in CET1 from YE 2021 to Q3 2023 is alarming and reflects:
+- Cumulative net charge-offs of $97M (2021-2023)
+- Additional provision expense of $95M in 2023
+- Dividend payments of $56M in 2022 and $42M in 2023 (prior to suspension)
+- Continued RWA growth as CRE portfolio expanded
+
+2. STRESS TESTING CONCERNS
+
+The Bank's internal stress test projects CET1 declining to 6.1% under severe adverse
+conditions, which is BELOW the 7.0% well-capitalized threshold. This means:
+
+(a) The Bank would be classified as "adequately capitalized" under stress,
+    triggering restrictions on brokered deposits and certain other activities
+(b) If actual losses exceed stress projections, the Bank could approach the
+    "undercapitalized" threshold (4.5% CET1), which would trigger Prompt
+    Corrective Action (PCA) requirements
+
+3. DIVIDEND POLICY
+
+The Bank paid common dividends totaling $98M during 2022-2023 despite deteriorating
+capital ratios. The payout ratio reached 62% in Q2 2023. This was imprudent given:
+- Rising CRE concentrations and deteriorating credit quality
+- Capital ratios trending toward minimums
+- Known OCC examination concerns communicated in prior supervisory letters
+
+The dividend suspension ordered in the Consent Order is appropriate and should have
+been implemented by management no later than Q1 2023.
+
+4. CAPITAL PLAN ASSESSMENT
+
+The Bank's Capital Plan (submitted February 2024) proposes:
+- $175M subordinated debt issuance
+- $412M CRE loan sale
+- $200M RWA optimization
+- Dividend suspension
+
+We assess this plan as MINIMALLY ADEQUATE. The actions, if executed on time, should
+restore CET1 above well-capitalized thresholds. However:
+- The plan relies heavily on market execution (sub debt pricing, loan sale completion)
+- The stress buffer (80 bps above 7.0% under severe stress) is thin
+- No equity issuance is planned unless conditions deteriorate further
+
+Recommendation: The Bank should prepare a shelf registration for common equity issuance
+($100-150M) as a contingency measure.
+
+5. CONCLUSIONS
+
+The capital component is rated 3 (Less Than Satisfactory) due to:
+- Significant capital deterioration over a short period
+- Insufficient stress buffers
+- Delayed management action on dividends
+- Reliance on market conditions for capital restoration
+
+Prepared by: Jonathan Blake, National Bank Examiner
+Reviewed by: Senior Supervisory Team, OCC Western District

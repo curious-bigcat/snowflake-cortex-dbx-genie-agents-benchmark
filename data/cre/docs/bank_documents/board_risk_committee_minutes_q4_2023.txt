@@ -1,0 +1,79 @@
+PACIFIC NORTHWEST BANK
+BOARD RISK COMMITTEE — MINUTES
+
+Meeting Date: December 12, 2023
+Location: PNB Headquarters, 1000 SW Broadway, Portland, OR — Boardroom, 18th Floor
+Time: 9:00 AM — 12:45 PM
+
+ATTENDEES:
+Directors: Thomas Richardson (Chairman), Linda Yamamoto, James Sullivan,
+           Karen Blackwood, Michael Torres, Dr. Amy Zhao
+Management: Margaret Liu (CEO), Robert Hartwell (CCO), David Park (CRO),
+            Elizabeth Warren (CFO), James Chen (Head of CRE)
+Legal: Katherine Oconnell (General Counsel)
+External: Patricia Kim (Director, Internal Audit), Michael Young (Deloitte, External Auditor)
+
+ITEM 1: OCC CONSENT ORDER 2023-CE-0847
+
+Mr. Hartwell presented a summary of the Consent Order issued November 15, 2023.
+Key requirements and proposed responses were discussed:
+
+Capital Plan (90-day deadline: February 13, 2024):
+- $175M subordinated debt issuance: CFO Warren reported that Goldman Sachs and
+  JPMorgan have been engaged as placement agents. Indicative terms: 10-year maturity,
+  7.5% coupon, expected closing Q1 2024.
+- $400M performing CRE loan sale: Head of CRE Chen reported a pool of 187 performing
+  loans has been identified. Blackstone Real Estate Debt Strategies has submitted an
+  indicative bid of 92 cents on the dollar ($368M). Additional bids expected from
+  Brookfield and Starwood.
+- Risk-weighted asset reduction of $200M: CRO Park outlined a plan to reduce
+  unfunded commitments and optimize risk weights through guarantee structures.
+
+RESOLUTION: The Board unanimously approved management's capital plan framework
+and authorized the CEO to finalize the subordinated debt offering and loan sale within
+the parameters presented.
+
+ITEM 2: DIVIDEND SUSPENSION
+
+Ms. Warren presented the financial impact of dividend suspension as required by the
+Consent Order. The Bank has paid $0.35/share quarterly ($14M/quarter) through Q2 2023.
+Q3 dividend was already suspended pending the OCC examination conclusion.
+
+RESOLUTION: The Board unanimously resolved to suspend all common stock dividends
+effective immediately, until capital ratios are restored above "well-capitalized" thresholds
+for two consecutive quarters, as required by Article I(b) of the Consent Order.
+
+ITEM 3: CRE PORTFOLIO UPDATE
+
+Mr. Chen presented the CRE portfolio health dashboard:
+- Total CRE exposure: $8.7B (420% of capital)
+- CRE Office: $3.85B (185% of capital) — primary area of concern
+- Loans rated 5-SS or worse: 34% of CRE office portfolio (up from 6% at YE 2021)
+- Workout pipeline: $2.1B in distressed loans under active workout
+- Non-accrual CRE loans: $1.2B (14% of CRE portfolio)
+- Charge-offs YTD: $87M (vs. $12M full year 2022)
+
+Notable individual credits discussed:
+- Cascadia Tower (CRE-2021-00847): Workout proposal approved for $16.5M principal
+  reduction. Charge-off to be recorded in Q4 2023.
+- Mercer Industrial Park (CRE-2020-01205): Borrower (Puget Industrial LLC) in default.
+  Foreclosure proceedings initiated. Expected loss: $8-12M.
+- Cedar Point Office Complex (CRE-2022-00456): Placed on non-accrual. DSCR 0.62x.
+  Borrower has been unresponsive. Workout officer assigned.
+
+ITEM 4: STRESS TEST RESULTS
+
+Mr. Park presented the results of the internal stress test (severe adverse scenario):
+- Assumptions: 18% additional office value decline, 45% vacancy, 6.5% unemployment
+- Projected CET1 impact: Decline from current 8.1% to 6.1%
+- This is BELOW the 7.0% "well-capitalized" threshold
+- Additional provision expense under stress: $340M
+- Capital plan actions (sub debt + loan sale) would restore CET1 to approximately 7.8% under stress
+
+RESOLUTION: The Board directed management to include the stress test results in the
+Capital Plan submission to the OCC and to implement monthly stress testing going forward.
+
+Meeting adjourned at 12:45 PM.
+
+Respectfully submitted,
+Katherine OConnell, Corporate Secretary

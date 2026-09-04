@@ -1,0 +1,35 @@
+LOAN PARTICIPATION AGREEMENT
+
+Date: August 5, 2021
+Lead Bank: JPMorgan Chase Bank, N.A. ("Lead Bank")
+Participant: Pacific Northwest Bank ("Participant")
+Borrower: Bellevue Gateway JV ("Borrower")
+
+PROJECT: Bellevue Gateway Mixed-Use Development
+Location: 10500 NE 8th Street, Bellevue, WA 98004
+Description: 45-story mixed-use tower (retail + office + residential)
+
+TERMS:
+
+Total Loan Facility: $200,000,000
+PNB Participation: $40,000,000 (20% share)
+Loan ID (PNB): CRE-2021-02100
+
+Rate: SOFR + 350 bps (currently 8.83%)
+Term: 5 years (maturity August 2026)
+Current Status: Under construction (72% complete as of December 2023)
+
+INTER-CREDITOR PROVISIONS:
+- Lead Bank has sole authority over workout decisions
+- Participant has consent rights for: maturity extension > 12 months,
+  principal reduction > 10%, change of property type
+- Pro rata loss sharing on any charge-offs or recoveries
+- Participant may sell its participation with 30-day right of first refusal to Lead Bank
+
+CURRENT STATUS (as of Q4 2023):
+- Construction 72% complete; expected completion Q3 2024
+- Cost overruns of $18M (9%) due to materials inflation and labor shortage
+- Borrower has funded $12M in additional equity; Lead Bank advanced $6M in overrun facility
+- PNB exposure unchanged at $40,000,000
+- Risk Rating: 4-SM (Special Mention) — elevated due to cost overruns and market uncertainty
+- Interest current; construction draws on schedule; no covenant defaults

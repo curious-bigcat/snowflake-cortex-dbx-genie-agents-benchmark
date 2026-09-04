@@ -1,0 +1,66 @@
+PACIFIC NORTHWEST BANK
+SPECIAL ASSETS GROUP — FORECLOSURE FILE
+
+Loan Number: CRE-2020-01205
+Borrower: Puget Industrial LLC
+Property: Mercer Industrial Park, 4500 Mercer Way, Seattle, WA 98109
+Original Balance: $32,000,000
+Current Balance: $30,100,000
+Risk Rating: 8-LOSS
+
+FORECLOSURE TIMELINE:
+
+March 15, 2023 — DEFAULT NOTICE
+Borrower missed third consecutive monthly payment. Loan classified DLQ90.
+Notice of default sent via certified mail to borrower and all guarantors.
+Cause: Anchor tenant (Pacific Northwest Logistics) vacated 185,000 SF facility
+at lease expiry. No replacement tenant identified. Occupancy fell to 22%.
+
+April 30, 2023 — DEMAND LETTER
+Demand for immediate payment of past-due amounts ($287,450) plus late fees.
+Borrower unable to cure. Guarantor (Michael Torres, Puget Industrial LLC Managing Member)
+net worth insufficient to cover shortfall.
+
+May 20, 2023 — WORKOUT ATTEMPT
+Bank offered loan modification (rate reduction + 12-month forbearance).
+Borrower accepted verbally but failed to execute modification documents by deadline.
+
+June 15, 2023 — ACCELERATION
+Bank exercised acceleration clause. Full balance of $30,100,000 declared due and payable.
+
+July 10, 2023 — FORECLOSURE FILING
+Non-judicial foreclosure commenced under Washington Deed of Trust Act (RCW 61.24).
+Notice of Trustee's Sale filed with King County Recorder.
+Trustee: Stewart Title Company of Washington
+
+August 1, 2023 — PROPERTY INSPECTION
+Bank-ordered inspection revealed deferred maintenance:
+- HVAC system requires $450,000 replacement
+- Roof membrane deterioration requiring $280,000 repair
+- Parking lot resurfacing needed ($120,000)
+- Estimated total deferred maintenance: $850,000
+
+October 12, 2023 — TRUSTEE'S SALE
+Property sold at trustee's sale. No third-party bidders.
+Bank credit bid: $22,000,000 (73% of outstanding balance)
+Property acquired as REO (Real Estate Owned).
+
+November 1, 2023 — REO CLASSIFICATION
+Property classified as REO on Bank's books.
+Carrying value: $22,000,000
+Estimated holding costs: $45,000/month (taxes, insurance, security, maintenance)
+
+January 2024 — LISTING
+Property listed for sale with CBRE at asking price of $24,500,000.
+Two prospective buyers touring as of February 2024.
+
+TOTAL LOSS ANALYSIS:
+Original Balance: $32,000,000
+Credit Bid (REO Value): $22,000,000
+Carrying Costs (est. 12 months): $540,000
+Legal Fees: $185,000
+Projected Total Loss: $10,725,000 (33.5% loss severity)
+
+If sold at asking price ($24.5M):
+Projected Recovery: $24,500,000 - $540,000 - $185,000 = $23,775,000
+Net Loss: $6,325,000 (21.0% loss severity)

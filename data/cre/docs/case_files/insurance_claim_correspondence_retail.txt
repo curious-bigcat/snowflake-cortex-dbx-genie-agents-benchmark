@@ -1,0 +1,47 @@
+PACIFIC NORTHWEST BANK
+CORRESPONDENCE FILE
+
+Re: Insurance Claim — Willamette River Plaza
+Property: 800 SW Naito Parkway, Portland, OR 97204
+Loan Number: CRE-2021-01567
+Borrower: Willamette Development Corp
+Insurance Carrier: Hartford Fire Insurance Company
+Claim Number: HFI-2023-44891
+
+TIMELINE:
+
+March 3, 2023 — INCIDENT
+A magnitude 4.2 earthquake centered near Portland caused structural damage to
+Willamette River Plaza, a 32,000 SF retail property. Damage includes:
+- Foundation cracks in east wall (structural engineering report attached)
+- HVAC ductwork separation on floors 2-3
+- Facade tile displacement (cosmetic but affecting ADA compliance at entrance)
+- Water damage from sprinkler line rupture in basement storage area
+
+March 8, 2023 — CLAIM FILED
+Borrower filed insurance claim with Hartford. Estimated damage: $2,800,000.
+Bank loss payee endorsement on file; all proceeds to be applied to repairs.
+
+April 12, 2023 — ADJUSTER REPORT
+Hartford adjuster assessed damage at $2,100,000 (30% below borrower's estimate).
+Disputed items: Foundation crack repair ($400K — adjuster considers preexisting),
+facade tile replacement ($300K — adjuster classifies as cosmetic, not covered).
+
+May 20, 2023 — BORROWER DISPUTE
+Borrower retained independent structural engineer who confirmed earthquake as
+proximate cause of foundation cracks. Bank's loss mitigation team supporting
+borrower's position as it protects collateral value.
+
+August 1, 2023 — SETTLEMENT
+Hartford agreed to $2,450,000 settlement. Funds disbursed to repair escrow
+account controlled by Bank. Repairs commenced September 2023.
+
+IMPACT ON COLLATERAL:
+Pre-earthquake appraised value: $15,200,000
+During repair (reduced functionality): $12,800,000
+Post-repair projected value: $14,500,000 ($700K permanent diminution due to
+seismic risk repricing in Portland metro market)
+
+Current Loan Balance: $13,800,000
+LTV (post-repair): 95.2% (above 75% covenant)
+Borrower has been notified of covenant breach; cure period applies.

@@ -18,11 +18,8 @@ env/
 # Cortex Code / Snowflake local
 .snowflake/
 
-# Reports and chart generation
-reports/
-
-# Data generators
-data_generator/
+# Camtasia project
+*.cmproj/
 
 # DBX trace data (raw benchmark output, not needed for reproduction)
 questions/databricks-info-data.md

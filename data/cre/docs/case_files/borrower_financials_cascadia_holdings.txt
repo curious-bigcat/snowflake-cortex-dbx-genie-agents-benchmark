@@ -1,0 +1,59 @@
+CASCADIA HOLDINGS LLC
+ANNUAL OPERATING STATEMENT — CASCADIA TOWER
+
+Prepared for: Pacific Northwest Bank (Lender)
+Period: Calendar Years 2021, 2022, 2023
+
+                              2021 Actual    2022 Actual    2023 Actual
+REVENUE
+  Base Rental Income          $14,850,000    $13,200,000    $5,950,000
+  CAM Reimbursements           $2,100,000     $1,980,000      $842,000
+  Parking Revenue              $1,530,000     $1,440,000      $580,000
+  Other Income                   $320,000       $290,000      $128,000
+TOTAL REVENUE                 $18,800,000    $16,910,000    $7,500,000
+
+OPERATING EXPENSES
+  Property Taxes               $2,850,000     $2,920,000    $2,980,000
+  Insurance                      $485,000       $520,000      $575,000
+  Utilities                    $1,680,000     $1,720,000    $1,250,000
+  Maintenance & Repairs          $890,000       $960,000      $720,000
+  Management Fee (4%)            $752,000       $676,400      $300,000
+  Leasing Commissions            $420,000       $380,000       $85,000
+  Security                       $360,000       $370,000      $280,000
+  Janitorial                     $580,000       $595,000      $310,000
+  Elevator & HVAC Service        $240,000       $255,000      $230,000
+  Legal & Professional           $128,000       $168,000      $370,000
+  Marketing & Tenant Events      $200,000       $145,600            $0
+TOTAL EXPENSES                 $8,585,000     $8,709,000    $7,100,000
+
+NET OPERATING INCOME (NOI)    $10,215,000     $8,201,000      $400,000
+  Less: Capital Reserves (2%)   ($376,000)     ($338,200)    ($150,000)
+ADJUSTED NOI                   $9,839,000     $7,862,800      $250,000
+
+DEBT SERVICE                   $4,793,052     $4,793,052    $4,793,052
+
+DEBT SERVICE COVERAGE RATIO       2.05x          1.64x         0.05x
+
+OCCUPANCY
+  Occupied SF                    400,750        352,000       161,500
+  Total Rentable SF              425,000        425,000       425,000
+  Occupancy Rate                 94.3%          82.8%         38.0%
+
+TENANT ROLLOVER SCHEDULE (as of December 31, 2023):
+  Lease Expiry Year    Tenant Count    SF        % of Total
+  2024                 4               28,500    6.7%
+  2025                 3               42,000    9.9%
+  2026                 2               51,500    12.1%  (includes Pacific Growth)
+  2027                 2               22,000    5.2%
+  2028+                1               17,500    4.1%
+  Vacant               —              263,500    62.0%
+  TOTAL                12             425,000    100.0%
+
+NOTE: 62% of the building is currently vacant. Of the occupied 38%, Pacific Growth Capital
+(the largest remaining tenant at 31,500 SF) has a lease expiring December 2026 with no
+renewal commitment. If Pacific Growth departs, occupancy would fall to approximately 26%.
+
+CAPITAL CONTRIBUTIONS BY GUARANTOR:
+David Nakamura has contributed $3,200,000 in personal funds since July 2023 to cover
+operating shortfalls and prevent payment default. His personal financial statement
+(dated October 2023) shows liquid net worth of $24,000,000.

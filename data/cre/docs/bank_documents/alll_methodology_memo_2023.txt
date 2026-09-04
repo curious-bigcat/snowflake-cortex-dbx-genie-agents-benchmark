@@ -1,0 +1,91 @@
+PACIFIC NORTHWEST BANK
+CREDIT RISK MANAGEMENT DIVISION
+
+ALLOWANCE FOR LOAN AND LEASE LOSSES (ALLL) — METHODOLOGY MEMORANDUM
+
+Date: October 30, 2023
+Prepared by: David Park, Chief Risk Officer
+Reviewed by: Elizabeth Warren, Chief Financial Officer
+Approved by: Board Audit Committee, November 2023
+
+1. OVERVIEW
+
+This memorandum documents the Bank's ALLL methodology following the transition to the
+Current Expected Credit Losses (CECL) standard (ASC 326). The methodology was updated in
+Q4 2023 in response to OCC examination findings regarding inadequate loss estimates for
+the CRE portfolio segment.
+
+2. METHODOLOGY COMPONENTS
+
+The Bank's ALLL is calculated as:
+
+  ALLL = Quantitative Reserve + Qualitative Adjustment (Q-Factor) + Specific Reserve
+
+a) QUANTITATIVE RESERVE (Historical Loss Rate Method)
+   - Based on the Bank's 5-year average loss rate by loan segment
+   - Adjusted for current economic conditions using a 2-year reasonable and supportable forecast
+   - Reversion to long-term average over a 1-year reversion period
+
+   Historical Loss Rates (5-year average):
+   Segment         Loss Rate
+   CRE Office      0.85%
+   CRE Multifamily 0.32%
+   CRE Retail      0.95%
+   CRE Industrial  0.28%
+   CRE Hotel       1.45%
+   CRE Land        2.10%
+   C&I             0.55%
+   Residential     0.18%
+
+b) QUALITATIVE ADJUSTMENTS (Q-Factors)
+   The Bank applies Q-factor adjustments to capture risks not reflected in historical loss data.
+   Q-factors are reviewed quarterly by the Credit Risk Committee.
+
+   Q-FACTOR HISTORY (CRE OFFICE SEGMENT):
+   Period     Q-Factor   Rationale
+   Q1 2021    +0.50%     Baseline — pandemic uncertainty
+   Q2 2021    +0.50%     No change
+   Q3 2021    +0.50%     No change
+   Q4 2021    +0.50%     No change
+   Q1 2022    +0.75%     Rising interest rates, early vacancy signals
+   Q2 2022    +1.00%     Tech sector cooling, Portland vacancy rising
+   Q3 2022    +1.00%     No change (NOTE: OCC found this should have been higher)
+   Q4 2022    +1.00%     No change
+   Q1 2023    +1.50%     Apex Technologies announced Portland reduction
+   Q2 2023    +2.00%     Multiple tenant departures, appraisal declines accelerating
+   Q3 2023    +3.00%     Post-OCC exam adjustment
+   Q4 2023    +3.50%     Full market deterioration recognition
+
+   The OCC examination found that Q-factors in Q3 2022 through Q1 2023 were understated by
+   approximately 1.0-1.5 percentage points, contributing to the $45-65M ALLL shortfall cited
+   in the Consent Order.
+
+c) SPECIFIC RESERVES
+   Individual impairment analysis for loans rated 6-SUB or worse with balances exceeding $5M.
+   Currently 78 loans with specific reserves totaling $142M.
+
+3. TOTAL ALLL SUMMARY (as of September 30, 2023)
+
+Segment          Balance     Quant Rate  Q-Factor  Total Rate  Reserve
+CRE Office       $3,850M     0.85%       3.50%     4.35%       $167.5M
+CRE Multifamily  $2,100M     0.32%       0.75%     1.07%       $22.5M
+CRE Retail       $980M       0.95%       1.25%     2.20%       $21.6M
+CRE Industrial   $870M       0.28%       0.50%     0.78%       $6.8M
+CRE Hotel        $450M       1.45%       2.00%     3.45%       $15.5M
+CRE Land         $350M       2.10%       1.50%     3.60%       $12.6M
+C&I              $4,200M     0.55%       0.30%     0.85%       $35.7M
+Residential      $2,800M     0.18%       0.10%     0.28%       $7.8M
+SUBTOTAL         $15,600M                                      $290.0M
+Less: Specific                                                 ($142.0M)
+TOTAL ALLL                                                     $432.0M
+
+ALLL as % of Total Loans: 2.77%
+ALLL as % of Non-Performing Loans: 36.0%
+
+4. OCC-IDENTIFIED SHORTFALL
+
+The OCC estimates an ALLL shortfall of $45-65M, primarily in the CRE Office segment.
+The Bank is addressing this through:
+- Updated Q-factors (see Q4 2023 adjustment above)
+- Expanded specific reserve analysis for CRE office loans rated 5-SS or worse
+- Engagement of independent ALLL validation consultant (PricewaterhouseCoopers)

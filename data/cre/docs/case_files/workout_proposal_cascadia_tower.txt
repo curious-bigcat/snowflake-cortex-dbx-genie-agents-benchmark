@@ -1,0 +1,77 @@
+PACIFIC NORTHWEST BANK
+SPECIAL ASSETS GROUP — WORKOUT PROPOSAL
+
+Date: November 28, 2023
+Loan Number: CRE-2021-00847
+Borrower: Cascadia Holdings LLC
+Property: Cascadia Tower, Portland, OR
+Current Balance: $78,500,000
+Risk Rating: 7-DBT (Doubtful)
+Workout Officer: Sarah Williams (ANL-0023)
+
+1. SITUATION SUMMARY
+
+Cascadia Tower's occupancy has fallen from 94.2% at origination to 38.0% following the
+departure of anchor tenant Apex Technologies and three smaller tenants. The September 2023
+reappraisal values the property at $78,000,000, down 40.5% from $131,000,000 at origination.
+Four of five loan covenants are in breach.
+
+The borrower, Cascadia Holdings LLC, has been cooperative and is requesting loan modification
+rather than pursuing strategic default. David Nakamura (managing member) has contributed
+$3.2M of personal funds to cover operating shortfalls since July 2023.
+
+2. PROPOSED RESTRUCTURING
+
+We recommend the following loan modification:
+
+a) PRINCIPAL REDUCTION: Write down from $78,500,000 to $62,000,000 (21.0% haircut)
+   - Charge-off of $16,500,000 to be taken in Q4 2023
+   - New LTV based on current appraisal: 79.5% ($62M / $78M)
+
+b) MATURITY EXTENSION: Extend from February 2028 to February 2031 (3-year extension)
+   - Provides time for market recovery and re-leasing
+   
+c) RATE REDUCTION: Reduce from 3.875% to 3.25% for 24 months
+   - Reduces monthly debt service by approximately $28,000/month
+   - Reverts to original rate after 24 months
+
+d) CASH SWEEP: 75% of excess cash flow above operating expenses and debt service
+   applied to principal reduction
+
+e) ADDITIONAL COLLATERAL: Borrower to pledge personal guaranty of David Nakamura
+   (net worth $24M per financial statement dated October 2023)
+
+f) COVENANT RESET:
+   - DSCR minimum: 1.00x for 12 months, then 1.15x, then 1.25x by month 24
+   - LTV maximum: 85% for 12 months, then 80%
+   - Occupancy minimum: 50% for 12 months, then 65%
+
+3. RECOVERY ANALYSIS
+
+Scenario 1 — Restructure (recommended):
+  Expected recovery: $62,000,000 - $68,000,000 (79-87% of current balance)
+  Timeline: 3-5 years
+  Present value at 6% discount: $52,000,000 - $57,000,000
+
+Scenario 2 — Foreclosure and REO sale:
+  Expected recovery: $55,000,000 - $62,000,000 (70-79% of current balance)
+  Timeline: 18-30 months (including legal costs of ~$2M)
+  Present value at 6% discount: $48,000,000 - $55,000,000
+
+Scenario 3 — Note sale:
+  Expected recovery: $54,000,000 - $58,000,000 (69-74% of current balance)
+  Indicative bids received from Blackstone ($56M) and Brookfield ($54.5M)
+  Timeline: 60-90 days
+
+4. RECOMMENDATION
+
+We recommend Scenario 1 (restructure) based on:
+- Highest expected present value recovery
+- Cooperative borrower with additional guaranty capacity
+- Avoids REO carrying costs and disposition risk
+- Portland office market expected to stabilize by 2025-2026
+
+Charge-off of $16,500,000 against ALLL required upon modification approval.
+
+Submitted by: Sarah Williams, VP, Special Assets
+Reviewed by: Robert J. Hartwell, Chief Credit Officer

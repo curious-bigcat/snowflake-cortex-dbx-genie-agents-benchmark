@@ -1,0 +1,72 @@
+PACIFIC NORTHWEST BANK
+CREDIT COMMITTEE MEMORANDUM
+
+Date: February 8, 2021
+Loan Number: CRE-2021-00847
+Borrower: Cascadia Holdings LLC
+Property: Cascadia Tower, 1200 SW Main St, Portland, OR 97205
+Loan Officer: James Chen (ANL-0001), Senior Vice President, Portland Main Branch (BR-001)
+
+RECOMMENDATION: APPROVE — $85,000,000 First Mortgage Loan
+
+1. EXECUTIVE SUMMARY
+
+We recommend approval of an $85,000,000 first mortgage loan secured by Cascadia Tower,
+a 42-story, 425,000 SF Class A office building in downtown Portland's Central Business District.
+The borrower, Cascadia Holdings LLC, is a single-purpose entity managed by David Nakamura,
+a seasoned CRE developer with 25+ years of Pacific Northwest market experience.
+
+2. PROPERTY DESCRIPTION
+
+Cascadia Tower is a LEED Gold-certified office tower completed in 2018. Key metrics:
+- Total Rentable Area: 425,000 SF across 42 floors
+- Current Occupancy: 94.2% (as of January 2021)
+- Anchor Tenant: Apex Technologies Inc. (floors 15-28, 147,000 SF, lease expires 2028)
+- Second Largest Tenant: Pacific Growth Capital (floors 30-35, 63,000 SF, lease expires 2026)
+- Remaining Tenants: 12 tenants averaging 17,900 SF each
+- Parking: 850 spaces (structured garage, levels B1-B3)
+- Current Appraised Value: $131,000,000 (Jones Lang LaSalle, January 15, 2021)
+
+3. LOAN TERMS
+
+- Loan Amount: $85,000,000
+- Loan-to-Value (LTV): 64.9% (based on $131M appraised value)
+- Term: 7 years (maturity February 2028)
+- Interest Rate: 3.875% fixed for 5 years, then ARM-5Y (SOFR + 215 bps)
+- Amortization: 30-year schedule with balloon at maturity
+- Monthly Payment (P&I): $399,421
+- Prepayment: Yield maintenance for 3 years, then 1% penalty, open last 6 months
+
+4. FINANCIAL ANALYSIS
+
+Net Operating Income (2020 Actual): $9,215,000
+Debt Service (Annual): $4,793,052
+Debt Service Coverage Ratio (DSCR): 1.92x (well above 1.35x policy minimum)
+Breakeven Occupancy: 68.3%
+
+5. COVENANTS
+
+- Minimum DSCR: 1.35x (tested quarterly)
+- Maximum LTV: 75% (tested annually at appraisal)
+- Minimum Occupancy: 80% (tested quarterly)
+- Minimum NOI: $6,375,000 annually
+- Debt Yield minimum: 8.0%
+- Interest Coverage Ratio minimum: 1.50x
+
+6. RISK ASSESSMENT
+
+Risk Rating: 2-PASS
+Primary Risks:
+- Tenant concentration: Apex Technologies represents 35% of rental income. Mitigant: 7-year
+  remaining lease term provides stability through loan maturity.
+- Market conditions: Portland CBD office vacancy at 11.8% (Q4 2020). Mitigant: Cascadia Tower
+  is Class A with modern amenities; vacancy is concentrated in Class B/C.
+- Interest rate risk: Fixed rate for initial 5 years mitigates near-term exposure.
+
+Underwriting Exceptions: NONE
+
+7. APPROVAL
+
+Recommended by: James Chen, SVP, Commercial Real Estate
+Approved by: Credit Committee (unanimous)
+Date: February 12, 2021

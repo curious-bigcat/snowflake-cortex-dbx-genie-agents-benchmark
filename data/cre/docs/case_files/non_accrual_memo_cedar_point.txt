@@ -1,0 +1,49 @@
+PACIFIC NORTHWEST BANK
+CREDIT MEMORANDUM — NON-ACCRUAL RECOMMENDATION
+
+Date: September 28, 2023
+Loan Number: CRE-2022-00456
+Borrower: Cedar Point Ventures LLC
+Property: Cedar Point Office Complex, 2800 NE Sandy Blvd, Portland, OR 97232
+
+RECOMMENDATION: Place on Non-Accrual Status
+
+1. BACKGROUND
+
+Cedar Point Office Complex is a 3-building, 85,000 SF suburban office campus.
+The loan was originated January 18, 2022 for $19,000,000 at 5.25% fixed.
+Current balance: $18,400,000.
+
+2. DETERIORATION
+
+The property has experienced rapid deterioration:
+- Occupancy declined from 88% at origination to 42% (current)
+- Two anchor tenants (combined 38,000 SF) departed in Q1 and Q2 2023
+- Current NOI: $1,142,000 (annualized) vs. debt service of $1,235,000
+- DSCR: 0.92x (below 1.00x — cash flow insufficient to service debt)
+- Current appraisal (August 2023): $14,200,000 (LTV: 130%)
+
+3. PAYMENT STATUS
+
+The borrower has been 90+ days past due since July 2023. Three consecutive payments
+missed. The borrower is unresponsive to communications.
+
+4. NON-ACCRUAL CRITERIA
+
+Per PNB Policy Section 12.4, a loan should be placed on non-accrual when:
+(a) Principal or interest is past due 90 days or more; AND
+(b) Full collection of principal and interest is doubtful
+
+Both criteria are met.
+
+5. ACCRUED INTEREST REVERSAL
+
+Accrued and uncollected interest of $241,500 (90 days) to be reversed against
+current period interest income.
+
+6. SPECIFIC RESERVE
+
+Recommended specific reserve: $4,200,000 (based on collateral shortfall)
+Calculation: $18,400,000 (balance) - $14,200,000 (appraisal) = $4,200,000
+
+Approved by: Robert J. Hartwell, Chief Credit Officer

@@ -1,0 +1,98 @@
+PACIFIC NORTHWEST BANK
+INTERNAL AUDIT DEPARTMENT
+
+AUDIT REPORT: CRE Lending Practices Review
+Report Number: IA-2023-017
+Date: August 14, 2023
+Classification: CONFIDENTIAL
+
+Audit Period: January 2021 — June 2023
+Auditor: Patricia Kim, CIA, CPA (Director of Internal Audit)
+Distribution: Board Audit Committee, CEO, CCO, CRO
+
+1. EXECUTIVE SUMMARY
+
+This audit reviewed CRE origination practices during the Bank's period of rapid growth
+(2021-2022). We sampled 1,200 of the 5,847 CRE loans originated during the audit period
+(20.5% sample rate).
+
+OVERALL RATING: UNSATISFACTORY
+
+Key Findings:
+- 23% of sampled CRE originations had one or more underwriting exceptions
+- Exception rate was highest at Portland Main (BR-001) at 31% and Seattle Central (BR-004) at 28%
+- Boise Downtown (BR-017) had the lowest exception rate at 12%
+- Most common exception types: DSCR below policy (42% of exceptions), LTV above policy (28%),
+  missing Environmental Phase I (18%), missing Credit Committee approval (12%)
+
+2. DETAILED FINDINGS
+
+Finding IA-2023-017-01 (HIGH): DSCR Exception Rate
+- 276 of 1,200 sampled loans (23%) had one or more exceptions
+- Of these, 116 loans had DSCR below the 1.25x policy minimum
+- Average DSCR for exception loans: 1.12x (vs 1.25x policy minimum)
+- 18 loans had DSCR below 1.00x at origination (negative leverage)
+- Exception approvals frequently lacked documented compensating factors
+
+Finding IA-2023-017-02 (HIGH): LTV Exception Rate
+- 77 loans had LTV above the 75% policy maximum at origination
+- Average LTV for exception loans: 79.3%
+- 12 loans had LTV above 85% at origination
+- Single-officer approvals used for 34 of these exceptions ($892M aggregate)
+  when Credit Committee approval was required
+
+Finding IA-2023-017-03 (HIGH): Missing Environmental Reports
+- 50 loans (approximately 15% of CRE originations above $5M) were missing
+  required Phase I Environmental Site Assessment reports
+- 8 properties were subsequently identified with potential environmental concerns
+  that would have been flagged by Phase I assessment
+
+Finding IA-2023-017-04 (MEDIUM): Credit Committee Bypass
+- 47 loans exceeding the $10M Credit Committee threshold were approved by
+  individual officers or regional committees without full Credit Committee review
+- Aggregate exposure of these loans: $1.8 billion
+- This finding was concentrated in Q4 2021 and Q1 2022 when origination volume
+  peaked and committee meeting frequency did not increase
+
+Finding IA-2023-017-05 (MEDIUM): Appraisal Age
+- 23 properties with appraisals older than 18 months were not flagged for update
+  as required by the Bank's Appraisal Policy Section 4.3
+- Combined exposure: $412M
+- 7 of these properties have since been reappraised with values 20-40% below
+  the stale appraisal used for ongoing covenant testing
+
+3. BRANCH-LEVEL ANALYSIS
+
+Branch                    Loans Sampled  Exceptions  Exception Rate
+Portland Main (BR-001)    287            89          31.0%
+Seattle Central (BR-004)  195            55          28.2%
+Bellevue (BR-006)         142            34          23.9%
+Eugene (BR-002)           98             21          21.4%
+Tacoma (BR-005)           88             19          21.6%
+Spokane (BR-008)          72             14          19.4%
+Salem (BR-003)            68             12          17.6%
+Bend (BR-009)             55             8           14.5%
+Boise Downtown (BR-017)   95             11          11.6%
+Other branches            200            13          6.5%
+TOTAL                     1,200          276         23.0%
+
+4. ROOT CAUSE ANALYSIS
+
+The high exception rate is attributable to:
+(a) Aggressive growth targets: CRE origination targets increased 85% from 2020 to 2021
+    without corresponding increase in underwriting staff or committee capacity
+(b) Incentive misalignment: Loan officer compensation was primarily volume-based with
+    insufficient quality metrics
+(c) Insufficient oversight: Credit Committee meeting frequency (monthly) was inadequate
+    for the volume of loans requiring review
+(d) Technology gaps: Exception tracking was manual (spreadsheet-based) with no
+    automated policy limit checks in the loan origination system
+
+5. RECOMMENDATIONS
+
+(a) Implement automated underwriting exception detection in loan origination system
+(b) Revise loan officer compensation to include credit quality metrics
+(c) Increase Credit Committee meeting frequency to bi-weekly
+(d) Hire 15 additional credit analysts to support underwriting capacity
+(e) Conduct portfolio-wide re-underwriting of all 2021-2022 CRE originations
+(f) Update Environmental Policy to require Phase I prior to commitment letter issuance

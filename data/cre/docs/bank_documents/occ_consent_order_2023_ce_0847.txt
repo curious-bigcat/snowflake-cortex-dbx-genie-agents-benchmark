@@ -1,0 +1,155 @@
+UNITED STATES OF AMERICA
+DEPARTMENT OF THE TREASURY
+OFFICE OF THE COMPTROLLER OF THE CURRENCY
+
+In the Matter of:
+Pacific Northwest Bank
+Portland, Oregon
+
+Consent Order No. 2023-CE-0847
+
+The Comptroller of the Currency of the United States of America ("Comptroller"), through
+the Examiner-in-Charge and his staff ("OCC"), has examined Pacific Northwest Bank ("Bank")
+and has identified unsafe or unsound banking practices and violations of law relating to
+the Bank's commercial real estate lending activities.
+
+FINDINGS
+
+The OCC finds that:
+
+1. CRE CONCENTRATION
+
+(a) As of September 30, 2023, the Bank's total CRE exposure was approximately $8.7 billion,
+    representing 420% of the Bank's total risk-based capital. This significantly exceeds
+    the 300% threshold established in the Interagency Guidance on Concentrations in
+    Commercial Real Estate Lending (SR 07-1, December 2006).
+
+(b) The Bank's CRE office sub-concentration was approximately 185% of capital, with no
+    Board-approved sub-limit for this property type.
+
+(c) Geographic concentration: 72% of CRE exposure is in the Portland-Seattle-Boise corridor,
+    creating correlated risk to Pacific Northwest economic conditions.
+
+2. UNDERWRITING DEFICIENCIES
+
+(a) The OCC's examination found that 23% of CRE loans originated during calendar years
+    2021 and 2022 contained one or more underwriting exceptions, including:
+    - 847 loans with DSCR below the Bank's 1.25x policy minimum (representing $2.3B)
+    - 312 loans with LTV above the Bank's 75% policy maximum (representing $1.1B)
+    - 156 loans missing required Environmental Phase I Site Assessment reports
+    - 47 loans approved without formal Credit Committee review as required for amounts
+      exceeding $10 million
+
+(b) Exception tracking and reporting to the Board was inadequate. The Bank's exception
+    report understated the actual exception rate by approximately 40%.
+
+3. ALLOWANCE FOR LOAN AND LEASE LOSSES (ALLL)
+
+(a) The Bank's ALLL methodology does not adequately capture the deterioration in the
+    CRE office portfolio. Qualitative adjustment factors (Q-factors) were last updated
+    in Q2 2022 and do not reflect current market conditions.
+
+(b) The Bank's total ALLL of $187 million (as of September 30, 2023) appears insufficient
+    given the risk profile of the CRE portfolio. OCC examiners estimate an ALLL shortfall
+    of approximately $45-65 million.
+
+4. RISK RATING TIMELINESS
+
+(a) The OCC's examination identified 234 CRE loans where risk rating downgrades were
+    delayed by an average of 2.3 quarters from the point when financial deterioration
+    signals were evident.
+
+(b) As a result, 34% of the CRE office portfolio is now rated Special Mention (5-SS)
+    or worse, up from 6% at year-end 2021.
+
+5. CAPITAL ADEQUACY
+
+(a) The Bank's CET1 capital ratio has declined from 11.4% at year-end 2021 to 8.1% as of
+    September 30, 2023.
+
+(b) Under the OCC's severe stress scenario, the Bank's CET1 ratio is projected to decline
+    to approximately 6.1%, below the 7.0% "well-capitalized" threshold.
+
+(c) The Bank continued to pay common stock dividends of $0.35/share quarterly through
+    Q2 2023 (payout ratio of 62%), inconsistent with the Bank's risk profile.
+
+6. EXAMINATION FINDINGS
+
+(a) The OCC has identified 47 total examination findings, of which:
+    - 12 are classified as Matters Requiring Immediate Attention (MRIA)
+    - 22 are classified as Matters Requiring Attention (MRA)
+    - 13 are classified as Recommendations (REC)
+
+(b) Of the 12 MRIA findings, 8 were originally identified in the 2022 examination and
+    remain unresolved.
+
+CONSENT ORDER
+
+NOW THEREFORE, the Bank, without admitting or denying the above findings, consents
+to the following requirements:
+
+ARTICLE I — CAPITAL PLAN (90-day deadline)
+
+The Bank shall, within ninety (90) days of this Order, submit to the OCC a Capital Plan
+that includes:
+(a) Specific actions to maintain CET1 ratio above 8.0% under baseline and above 7.0%
+    under stress scenarios, including but not limited to:
+    - Issuance of subordinated debt (minimum $175 million)
+    - Sale of performing CRE loans (target: $400 million)
+    - Risk-weighted asset reduction through portfolio optimization (target: $200 million)
+(b) Suspension of common stock dividends until capital ratios are restored to
+    "well-capitalized" levels and maintained for two consecutive quarters
+(c) Monthly capital reporting to the OCC
+
+ARTICLE II — CRE CONCENTRATION MANAGEMENT (120-day deadline)
+
+(a) Establish Board-approved concentration limits for total CRE and each CRE sub-type
+(b) Develop a plan to reduce total CRE concentration below 350% of capital within 18 months
+(c) Cease origination of new CRE office loans until concentration is below 150% of capital
+
+ARTICLE III — ALLL METHODOLOGY (60-day deadline)
+
+(a) Engage an independent third party to validate the ALLL methodology
+(b) Update Q-factors to reflect current market conditions
+(c) Establish quarterly Q-factor review process with Board oversight
+
+ARTICLE IV — RISK RATING (30-day deadline)
+
+(a) Complete re-rating of entire CRE portfolio within 30 days
+(b) Implement monthly credit quality monitoring dashboard
+(c) Establish maximum 30-day timeline for rating downgrades upon trigger events
+
+ARTICLE V — UNDERWRITING (60-day deadline)
+
+(a) Revise CRE underwriting standards to eliminate identified gaps
+(b) Establish independent exception tracking and reporting to the Board
+(c) Require Credit Committee approval for all CRE loans exceeding $5 million
+
+ARTICLE VI — EXAMINATION FINDINGS (ongoing)
+
+(a) Remediate all 12 MRIA findings within 180 days
+(b) Remediate all 22 MRA findings within 365 days
+(c) Provide monthly remediation progress reports to the OCC
+
+ARTICLE VII — BOARD OVERSIGHT
+
+(a) The Board shall review this Order at each regular meeting
+(b) The Board shall appoint a Compliance Committee to oversee implementation
+(c) The Chief Credit Officer shall provide monthly written reports to the Board
+
+EFFECTIVE DATE: November 15, 2023
+
+Acting Comptroller of the Currency
+Office of the Comptroller of the Currency
+
+CONSENT:
+
+_________________________
+Thomas A. Richardson
+Chairman of the Board
+Pacific Northwest Bank
+
+_________________________
+Margaret Liu
+President and Chief Executive Officer
+Pacific Northwest Bank
