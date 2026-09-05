@@ -28,16 +28,16 @@ Both platforms received identical data: 18 tables (3.6M rows of CRE lending data
 | **Accuracy** | Fraction of question sub-parts answered correctly with verifiable data | Manual evaluation: each sub-part scored as correct/incorrect against ground truth from the database and documents |
 | **Groundedness** | Whether each factual claim in the response can be traced to a SQL result or document citation | Manual claim-by-claim verification: grounded = traceable to data/doc, ungrounded = fabricated or from general knowledge |
 | **Hallucinations** | Fabricated facts not present in the data or documents, or facts from general knowledge presented as if retrieved | Subset of ungrounded claims where the agent presented non-data-sourced content without disclaiming it |
-| **Latency** | Wall-clock time from request to complete response | Snowflake: `DATEDIFF(start_time, end_time)` from `SNOWFLAKE_COWORK_USAGE_HISTORY` in `SNOWFLAKE.ACCOUNT_USAGE`. Databricks: `predict_stream` top-level trace span duration |
-| **Token usage** | Total tokens consumed per question | Snowflake: `TOKENS_GRANULAR` from `SNOWFLAKE_COWORK_USAGE_HISTORY` (broken down by cache_read, cache_write, uncached, output). Databricks: sum of all `llm` span token counts from agent traces |
-| **Tool calls** | Number of tool invocations (SQL queries, document searches, code execution) | Snowflake: counted from response content ("Retrieved data" = SQL, "Searched Search" = Search). Databricks: counted from genie/ka/sandbox trace spans |
+| **Latency** | Wall-clock time from request to complete response | Each platform's native observability. Snowflake: account usage views (`start_time` to `end_time`). Databricks: top-level agent trace span duration. Both measure the same thing -- total time from user question to final response. |
+| **Token usage** | Total tokens consumed per question | Each platform's native observability. Snowflake: account usage views with per-model breakdown (cache_read, cache_write, uncached, output). Databricks: LLM span token counts from agent traces. Note: token accounting differs between platforms (see Section 4). |
+| **Tool calls** | Number of tool invocations (SQL queries, document searches, code execution) | Both platforms: counted from response content and trace spans. Snowflake: "Retrieved data" = SQL query, "Searched Search" = search call. Databricks: genie/ka/sandbox trace spans. |
 | **Tool failures** | Tool calls that returned empty results, wrong data, or timed out | Snowflake: queries returning 0 rows that required retry. Databricks: Genie EMPTY results, KA wrong-corpus returns, timeouts |
 | **Document retrieval** | Whether the agent successfully found relevant documents from the corpus | Snowflake: Search call returned content from the correct PNB documents. Databricks: KA call returned content from the correct PNB documents (vs wrong corpus) |
 | **Analytical transparency** | Whether the agent proactively flagged data caveats, discrepancies, or reconciliation notes | Manual evaluation: did the response surface nuances (e.g., scope differences, aggregation basis, document-vs-table conflicts) or present numbers without qualification? |
 
 ### What We Did NOT Measure
 
-- **Token cost in dollars**: Snowflake reports 6.11 credits total for 10 questions via `SNOWFLAKE_COWORK_USAGE_HISTORY`. On the Databricks side, Genie One and Genie Agents (including the Supervisor Agent and Knowledge Assistant used in this benchmark) are free for user-initiated usage until January 31, 2027 per Databricks official documentation; only SQL warehouse compute (DBUs) and service-principal usage are billed. Since the two platforms use fundamentally different billing models and Databricks is currently in a promotional free period for these agent types, a direct dollar comparison is not meaningful at this time.
+- **Token cost in dollars**: Snowflake reports 6.11 credits total for 10 questions via account usage views. On the Databricks side, Genie One and Genie Agents (including the Supervisor Agent and Knowledge Assistant used in this benchmark) are free for user-initiated usage until January 31, 2027 per Databricks official documentation; only SQL warehouse compute (DBUs) and service-principal usage are billed. Since the two platforms use fundamentally different billing models and Databricks is currently in a promotional free period for these agent types, a direct dollar comparison is not meaningful at this time.
 - **Model capability in isolation**: Both agents use different underlying models. This benchmark measures the full agent system (model + tools + retrieval + schema guidance), not the LLM alone.
 - **Knowledge store tuning**: Databricks Genie Agents support a knowledge store with SQL expressions, example SQL, synonyms, and column descriptions. The level of knowledge store curation affects SQL accuracy. Snowflake's Semantic View provides an equivalent semantic layer. Both were configured with their respective platform's standard approach to schema guidance. The document retrieval failures observed are independent of knowledge store configuration -- they stem from the Knowledge Assistant corpus indexing.
 
@@ -103,7 +103,7 @@ Cortex is 100% grounded -- every factual claim traces to a SQL result or cited d
 
 ![Latency per Question](cre_charts/02_latency.png)
 
-Snowflake latency measured from `SNOWFLAKE_COWORK_USAGE_HISTORY` (start_time to end_time). Databricks latency measured from `predict_stream` trace span.
+Snowflake latency measured from account usage views (start_time to end_time). Databricks latency measured from top-level agent trace span. Both represent wall-clock time from question to complete response.
 
 | Question | Cortex (s) | Databricks (s) | Ratio |
 |---|---|---|---|
@@ -127,7 +127,7 @@ The latency gap widens as questions get more complex. SQL-only questions (G06) s
 
 ## 4. Token Usage
 
-Snowflake tokens measured from `SNOWFLAKE_COWORK_USAGE_HISTORY.TOKENS_GRANULAR` (per-model breakdown with cache detail). Databricks tokens summed from LLM span counts in agent traces.
+Snowflake tokens measured from account usage views with per-model breakdown and cache detail. Databricks tokens summed from LLM span counts in agent traces.
 
 **Note:** These are not directly comparable. Snowflake reports total context including cache reads (78% of input at 90% discount). Databricks traces show per-LLM-call context sizes that grow cumulatively as the supervisor accumulates tool outputs.
 

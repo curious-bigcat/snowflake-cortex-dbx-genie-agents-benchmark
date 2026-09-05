@@ -19,7 +19,7 @@ Comparative benchmark of **Snowflake Cortex Agent** vs **Databricks Genie** on c
 | Tool Success Rate | 94% | 76% | +18pp |
 | Doc Retrieval | 100% (5/5) | 0% (0/13) | Complete failure |
 
-Cortex latency and tokens measured from `SNOWFLAKE.ACCOUNT_USAGE.SNOWFLAKE_COWORK_USAGE_HISTORY`. Databricks latency and tokens measured from agent trace spans. See `reports/cre_benchmark_report.md` for full methodology and per-question detail.
+All metrics measured using each platform's native observability: Snowflake via account usage views, Databricks via agent trace spans. Both capture wall-clock latency, token consumption, and tool call activity. See `reports/cre_benchmark_report.md` for full methodology and per-question detail.
 
 ## Repository Structure
 
