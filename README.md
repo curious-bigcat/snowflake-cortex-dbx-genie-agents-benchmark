@@ -4,7 +4,7 @@ Comparative benchmark of **Snowflake Cortex Agent** vs **Databricks Genie** on c
 
 ## Demo: Live Side-by-Side Comparison
 
-https://github.com/curious-bigcat/snowflake-cortex-dbx-genie-agents-benchmark/raw/main/cortex_vs_genie_demo.mp4
+<video src="https://github.com/curious-bigcat/snowflake-cortex-dbx-genie-agents-benchmark/raw/main/cortex_vs_genie_demo.mp4" controls width="100%"></video>
 
 ## Benchmark: CRE Portfolio Stress & Workout
 
