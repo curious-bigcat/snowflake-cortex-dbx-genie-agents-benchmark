@@ -24,8 +24,7 @@ env/
 # DBX trace data (raw benchmark output, not needed for reproduction)
 questions/databricks-info-data.md
 
-# Recordings / videos
-*.mp4
+# Recordings / videos (allow the demo mp4)
 *.mov
 *.avi
 *.mkv

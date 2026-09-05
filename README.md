@@ -2,6 +2,10 @@
 
 Comparative benchmark of **Snowflake Cortex Agent** vs **Databricks Genie** on complex, multi-source financial services workloads.
 
+## Demo: Live Side-by-Side Comparison
+
+https://github.com/curious-bigcat/snowflake-cortex-dbx-genie-agents-benchmark/raw/main/cortex_vs_genie_demo.mp4
+
 ## Benchmark: CRE Portfolio Stress & Workout
 
 **Scenario:** Pacific Northwest Bank (PNB), a $28B regional bank, aggressively grew its CRE lending book from $3.2B to $8.7B (2019-2022). A 2023 office market crash (vacancy 12% to 31%) triggers cascading defaults, an OCC Consent Order, and a $2.1B workout pipeline.
@@ -12,20 +16,30 @@ Comparative benchmark of **Snowflake Cortex Agent** vs **Databricks Genie** on c
 
 | Metric | Cortex Agent | Databricks Genie | Delta |
 |---|---|---|---|
-| Accuracy | 95% | 55% | +40pp |
-| Groundedness | 100% (0 hallucinations) | 71% (35 ungrounded claims) | +29pp |
-| Avg Latency | 41s | 255s | 6.2x faster |
-| Tool Calls | 35 | 74 | 2.1x fewer |
-| Tool Success Rate | 94% | 76% | +18pp |
-| Doc Retrieval | 100% (5/5) | 0/13 -- config error (wrong volume) | N/A |
+| Accuracy | 95.7% (45/47 sub-parts) | 82.2% (37/45 sub-parts) | +13.5pp |
+| Groundedness | 100% (0 hallucinations) | ~89% (~13 ungrounded claims) | +11pp |
+| Avg Latency | 41s | 173s | 4.2x faster |
+| Tool Calls | 35 | 59 | 1.7x fewer |
+| Tool Success Rate | 94% | 90% | +4pp |
+| Doc Retrieval | 100% (5/5) | 85% (11/13) | +15pp |
+| LLM-as-Judge (automated) | 45.1/50 (90%) | 26.2/50 (52%) | 10-0 sweep |
 
-All metrics measured using each platform's native observability: Snowflake via account usage views, Databricks via agent trace spans. Both capture wall-clock latency, token consumption, and tool call activity. See `reports/cre_benchmark_report.md` for full methodology and per-question detail.
+All metrics measured using each platform's native observability: Snowflake via account usage views, Databricks via agent trace spans. Both capture wall-clock latency, token consumption, and tool call activity. The LLM-as-Judge evaluation uses Claude Sonnet (`claude-sonnet-4-5`, temperature=0) scoring both responses against verified ground truth across 5 dimensions (Accuracy, Groundedness, Relevance, Actionability, Visual Richness). See `reports/cre_benchmark_report.md` for full methodology, per-question detail, and user experience analysis.
 
 ## Repository Structure
 
 ```
 genie_cortex/
 ├── README.md
+├── cortex_vs_genie_demo.mp4  # Live demo recording
+├── live_compare/                  # Agent Duel: side-by-side comparison UI
+│   ├── src/
+│   │   ├── components/            # React components (AgentPanel, EvalCard, etc.)
+│   │   ├── services/              # Snowflake & Databricks API clients
+│   │   ├── hooks/                 # useAgentQuery (SSE streaming + blocking)
+│   │   └── utils/                 # Ground truth, config, UX metrics
+│   ├── server/proxy.js            # CORS proxy for Databricks endpoint
+│   └── package.json
 ├── config/
 │   ├── cortex_agent/
 │   │   ├── cre_semantic_view.sql   # Semantic View DDL (18 tables, VQRs, metrics)

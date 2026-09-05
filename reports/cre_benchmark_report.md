@@ -3,7 +3,7 @@
 **Benchmark:** Pacific Northwest Bank CRE Portfolio Stress & Workout
 **Questions:** G01-G10 (complex multi-part queries requiring SQL + document retrieval + banking domain reasoning)
 **Dataset:** 3.6M rows, 18 tables, 30 documents (identical on both platforms)
-**Date:** September 2026
+**Date:** September 2026\n**Demo:** [Live side-by-side recording](../cortex_vs_genie_demo.mp4)
 
 ---
 
