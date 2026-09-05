@@ -2,10 +2,6 @@
 
 Comparative benchmark of **Snowflake Cortex Agent** vs **Databricks Genie** on complex, multi-source financial services workloads.
 
-## Demo: Live Side-by-Side Comparison
-
-<video src="https://github.com/curious-bigcat/snowflake-cortex-dbx-genie-agents-benchmark/raw/main/cortex_vs_genie_demo.mp4" controls width="100%"></video>
-
 ## Benchmark: CRE Portfolio Stress & Workout
 
 **Scenario:** Pacific Northwest Bank (PNB), a $28B regional bank, aggressively grew its CRE lending book from $3.2B to $8.7B (2019-2022). A 2023 office market crash (vacancy 12% to 31%) triggers cascading defaults, an OCC Consent Order, and a $2.1B workout pipeline.
