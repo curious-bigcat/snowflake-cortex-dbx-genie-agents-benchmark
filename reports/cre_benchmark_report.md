@@ -43,6 +43,8 @@ Both platforms received identical data: 18 tables (3.6M rows of CRE lending data
 
 ## Executive Summary
 
+![Aggregate Comparison](cre_charts/06_aggregate.png)
+
 | Metric | Cortex Agent | Databricks Genie | Delta |
 |---|---|---|---|
 | Accuracy | 95.7% (45/47 sub-parts) | 82.2% (37/45 sub-parts) | +13.5pp |
@@ -60,6 +62,8 @@ Both platforms demonstrate strong performance on SQL-only questions. The differe
 ---
 
 ## 1. Accuracy
+
+![Accuracy per Question](cre_charts/01_accuracy.png)
 
 | Question | Cortex | Databricks | Notes |
 |---|---|---|---|
@@ -81,6 +85,8 @@ Both platforms demonstrate strong performance on SQL-only questions. The differe
 ---
 
 ## 2. Groundedness
+
+![Groundedness](cre_charts/05_groundedness.png)
 
 Cortex is 100% grounded -- every factual claim traces to a SQL result or cited document (with numbered footnotes). Databricks achieves ~89% groundedness with the corrected KA configuration. Ungrounded claims fall into two categories:
 
@@ -105,6 +111,8 @@ Cortex is 100% grounded -- every factual claim traces to a SQL result or cited d
 
 ## 3. Latency
 
+![Latency per Question](cre_charts/02_latency.png)
+
 Snowflake latency measured from account usage views (start_time to end_time). Databricks latency measured from top-level agent trace span. Both represent wall-clock time from question to complete response.
 
 | Question | Cortex (s) | Databricks (s) | Ratio |
@@ -120,6 +128,8 @@ Snowflake latency measured from account usage views (start_time to end_time). Da
 | G09: MRIA Findings | 38 | 122 | 3.2x |
 | G10: Loan Sale Impact | 23 | 131 | 5.7x |
 | **Average** | **41** | **173** | **4.2x** |
+
+![Latency Trend](cre_charts/08_latency_trend.png)
 
 The latency gap correlates with the number of Genie calls. Simple questions with 2-3 Genie calls (G07: 81s, G08: 86s) show modest gaps (2-3x). Questions where Genie SQL needed multiple retries (G04: 12 calls, 558s) show large gaps (12x). Each Genie call costs 17-58s due to the ask_question → start_conversation → poll_for_result cycle.
 
@@ -150,6 +160,8 @@ Databricks traces report per-LLM-call context sizes. Because the supervisor agen
 
 ### Per-Question Breakdown
 
+![Token Usage](cre_charts/03_tokens.png)
+
 | Question | Cortex Total | Cortex New Tokens (output + cache write) | Cortex Cache Read % | Databricks Total | Cortex Credits |
 |---|---|---|---|---|---|
 | G01 | 531,033 | 86,447 | 84.4% | 38,100 | 0.554 |
@@ -178,6 +190,8 @@ The net result: **6.11 credits for 10 complex banking questions** (avg 0.61 cred
 
 ## 5. Tool Call Efficiency
 
+![Tool Calls](cre_charts/04_tool_calls.png)
+
 | Metric | Cortex | Databricks |
 |---|---|---|
 | Total tool calls | 35 | 59 |
@@ -189,6 +203,8 @@ The net result: **6.11 credits for 10 complex banking questions** (avg 0.61 cred
 | Tool success rate | 94% | 90% |
 
 ### Tool Failure Breakdown (Databricks)
+
+![DBX Failure Modes](cre_charts/07_dbx_failures.png)
 
 | Failure Type | Count | Impact |
 |---|---|---|
