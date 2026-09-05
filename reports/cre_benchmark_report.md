@@ -55,7 +55,7 @@ Both platforms received identical data: 18 tables (3.6M rows of CRE lending data
 | Avg Latency | 41s | 255s (4.2 min) | 6.2x faster |
 | Tool Calls | 35 total (30 SQL + 5 Search) | 74 total (50 Genie + 13 KA + 11 Sandbox) | 2.1x fewer |
 | Tool Failures | 2 (6%) | 18 (24%) | 4x fewer |
-| Doc Retrieval | 5/5 successful (100%) | 0/13 successful (0%) -- config error (see Section 6) | Complete failure |
+| Doc Retrieval | 5/5 successful (100%) | 0/13 -- wrong volume connected (config error, see Section 6) | N/A (not a valid comparison) |
 | Analytical Transparency | 10/10 questions with proactive caveats | 2/10 questions | +8 questions |
 | Snowflake Credits | 6.11 total (10 questions) | N/A | -- |
 
