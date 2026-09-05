@@ -4,6 +4,7 @@
 **Questions:** G01-G10 (complex multi-part queries requiring SQL + document retrieval + banking domain reasoning)
 **Dataset:** 3.6M rows, 18 tables, 30 documents (identical on both platforms)
 **Date:** September 2026
+**Demo:** [![Watch the demo](https://img.youtube.com/vi/g5XvNhRDAcg/hqdefault.jpg)](https://youtu.be/g5XvNhRDAcg)
 
 ---
 
