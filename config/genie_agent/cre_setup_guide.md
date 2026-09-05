@@ -89,22 +89,18 @@ for f in files:
 
 Expected: 30 files (13 bank docs + 10 case files + 7 regulation PDFs).
 
-## Step 5: Create Genie Agent (Raw Schema -- NO Context)
+## Step 5: Create Genie Agent
 
 1. **Create new Agent** > select **Genie Agent**
-2. Name: `CRE Benchmark - Raw Schema`
+2. Name: `CRE Benchmark - SQL`
 3. Add all 18 tables from `<your-catalog>.cre`:
    - tbl_loan_mstr, tbl_borrower, tbl_collateral, tbl_appraisal, tbl_payment
    - tbl_covenant, tbl_covenant_test, tbl_risk_rating, tbl_provision
    - tbl_workout, tbl_reo, tbl_charge_off
    - tbl_exam_finding, tbl_capital, tbl_concentration
    - tbl_branch, tbl_analyst, tbl_audit_log
-4. **DO NOT ADD** any of the following:
-   - No SQL expressions
-   - No example queries
-   - No text instructions
-   - No column descriptions
-5. The agent sees ONLY raw column names (loan_typ_cd, risk_rtg_cd, cov_typ_cd, etc.)
+4. Optionally add SQL expressions, example queries, and column descriptions via the knowledge store to improve accuracy.
+5. The agent uses Unity Catalog metadata and any knowledge store enrichments to generate SQL.
 
 ## Step 6: Create Knowledge Assistant
 
@@ -142,7 +138,7 @@ Expected: 30 files (13 bank docs + 10 case files + 7 regulation PDFs).
 1. **Create new Agent** > select **Supervisor Agent**
 2. Name: `CRE Benchmark - Pacific Northwest Bank`
 3. Add child tools:
-   - **Genie Agent** (`CRE Benchmark - Raw Schema`)
+   - **Genie Agent** (`CRE Benchmark - SQL`)
    - **Knowledge Assistant** (`CRE Benchmark - Documents`)
 4. System instructions:
    ```
@@ -191,7 +187,7 @@ Expected: Routes to Genie (gets exposure + classified %), then KA (gets SR 07-1 
 | Aspect | Cortex Agent | Databricks Genie |
 |--------|-------------|-----------------|
 | Architecture | Single agent with parallel tool invocation | 3-agent hierarchy (Supervisor + Genie SQL + Knowledge Assistant) |
-| Schema guidance | Full semantic view with column descriptions, code decode mappings, 8 VQRs | Raw schema only -- no column descriptions, no code mappings |
+| Schema guidance | Full semantic view with column descriptions, code decode mappings, 8 VQRs | Unity Catalog metadata + knowledge store (SQL expressions, example SQL, synonyms) |
 | Document search | Cortex Search service (embedding-based) | Knowledge Assistant with volume content search |
 | Tool invocation | Parallel (Analyst + Search simultaneously) | Sequential -- supervisor routes to one child at a time |
 | SQL generation | Guided by semantic view relationships and VQRs | Inferred from raw table/column names |

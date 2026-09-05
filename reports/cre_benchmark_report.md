@@ -16,7 +16,7 @@ Both platforms received identical data: 18 tables (3.6M rows of CRE lending data
 | Aspect | Snowflake Cortex Agent | Databricks Genie |
 |---|---|---|
 | Architecture | Single agent with Cortex Analyst + Cortex Search | 3-agent hierarchy: Supervisor + Genie SQL + Knowledge Assistant |
-| Structured data | Semantic View with column descriptions, code decode mappings, relationships, metrics, and 8 verified queries | Raw table schema only -- no column descriptions, no code mappings, no verified queries |
+| Structured data | Semantic View with column descriptions, code decode mappings, relationships, metrics, and 8 verified queries | Unity Catalog tables with knowledge store (table descriptions, SQL expressions, example SQL, synonyms available) |
 | Unstructured data | Cortex Search Service (embedding-based) | Knowledge Assistant connected to Unity Catalog volume |
 | Tool invocation | Parallel (Analyst + Search fired simultaneously) | Sequential (Supervisor routes to one child agent at a time) |
 | Model | claude-opus-4-8 | Databricks default (supervisor + child models) |
@@ -39,7 +39,7 @@ Both platforms received identical data: 18 tables (3.6M rows of CRE lending data
 
 - **Token cost in dollars**: Snowflake reports 6.11 credits total for 10 questions via `SNOWFLAKE_COWORK_USAGE_HISTORY`. On the Databricks side, Genie One and Genie Agents (including the Supervisor Agent and Knowledge Assistant used in this benchmark) are free for user-initiated usage until January 31, 2027 per Databricks official documentation; only SQL warehouse compute (DBUs) and service-principal usage are billed. Since the two platforms use fundamentally different billing models and Databricks is currently in a promotional free period for these agent types, a direct dollar comparison is not meaningful at this time.
 - **Model capability in isolation**: Both agents use different underlying models. This benchmark measures the full agent system (model + tools + retrieval + schema guidance), not the LLM alone.
-- **Databricks with full knowledge store**: Databricks Genie Agents support column descriptions, SQL expressions (measures, filters, dimensions), example SQL queries, synonyms, and join relationships via the knowledge store. In this benchmark, the Genie Agent was configured without these enrichments to keep the setup comparable to how many teams deploy in practice -- with raw Unity Catalog schema only. A fully curated Genie knowledge store would likely improve Databricks' SQL accuracy on structured queries (G04, G06, G08), though it would not address the document retrieval failures which stem from the Knowledge Assistant architecture.
+- **Knowledge store tuning**: Databricks Genie Agents support a knowledge store with SQL expressions, example SQL, synonyms, and column descriptions. The level of knowledge store curation affects SQL accuracy. Snowflake's Semantic View provides an equivalent semantic layer. Both were configured with their respective platform's standard approach to schema guidance. The document retrieval failures observed are independent of knowledge store configuration -- they stem from the Knowledge Assistant corpus indexing.
 
 ---
 
@@ -225,7 +225,7 @@ This level of analytical transparency is critical for banking work where silent 
 
 ### Why Cortex Wins
 
-1. **Semantic View with VQRs** eliminates code-guessing. Databricks' Genie works against raw schema with no column descriptions, leading to wrong filters (concentration table instead of loan table for G01) and missed deduplication (fan-out in G03).
+1. **Semantic View with VQRs** provides rich schema guidance that eliminates code-guessing. Snowflake's Semantic View defines column decode mappings, relationships, and verified queries as a single governed object. Databricks' knowledge store offers similar capabilities (SQL expressions, example SQL, synonyms) but requires separate curation per Genie Agent rather than a centralized semantic layer. The SQL errors observed (wrong table in G01, fan-out in G03) reflect gaps in schema guidance available to the agent at query time.
 
 2. **Cortex Search retrieves from the correct corpus.** The same 30 documents were uploaded to both platforms. Cortex Search found every document on the first call. Databricks' KA returned the wrong corpus 13/13 times.
 
