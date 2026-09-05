@@ -37,7 +37,7 @@ Both platforms received identical data: 18 tables (3.6M rows of CRE lending data
 
 ### What We Did NOT Measure
 
-- **Token cost in dollars**: Snowflake reports credits (6.11 total for 10 questions) via `SNOWFLAKE_COWORK_USAGE_HISTORY`. Databricks Genie Spaces do not charge per token or per question for LLM reasoning -- cost is driven by the SQL warehouse compute (DBUs) that executes Genie-generated queries. Since the two platforms use fundamentally different billing models (Snowflake credits vs Databricks DBUs for warehouse compute), a direct dollar comparison would require pricing and discount assumptions specific to each customer's contract.
+- **Token cost in dollars**: Snowflake reports 6.11 credits total for 10 questions via `SNOWFLAKE_COWORK_USAGE_HISTORY`. On the Databricks side, Genie One and Genie Agents (including the Supervisor Agent and Knowledge Assistant used in this benchmark) are free for user-initiated usage until January 31, 2027 per Databricks official documentation; only SQL warehouse compute (DBUs) and service-principal usage are billed. Since the two platforms use fundamentally different billing models and Databricks is currently in a promotional free period for these agent types, a direct dollar comparison is not meaningful at this time.
 - **Model capability in isolation**: Both agents use different underlying models. This benchmark measures the full agent system (model + tools + retrieval + schema guidance), not the LLM alone.
 - **Databricks with column descriptions**: Genie received raw schema only to test the realistic scenario where teams have not invested in metadata. A future benchmark could add Databricks AI/BI Dashboard instructions for a more equal comparison.
 
