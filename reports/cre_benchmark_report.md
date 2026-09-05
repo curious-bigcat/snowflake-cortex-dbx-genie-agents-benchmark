@@ -55,7 +55,7 @@ Both platforms received identical data: 18 tables (3.6M rows of CRE lending data
 | Avg Latency | 41s | 255s (4.2 min) | 6.2x faster |
 | Tool Calls | 35 total (30 SQL + 5 Search) | 74 total (50 Genie + 13 KA + 11 Sandbox) | 2.1x fewer |
 | Tool Failures | 2 (6%) | 18 (24%) | 4x fewer |
-| Doc Retrieval | 5/5 successful (100%) | 0/13 successful (0%) | Complete failure |
+| Doc Retrieval | 5/5 successful (100%) | 0/13 successful (0%) -- config error (see Section 6) | Complete failure |
 | Analytical Transparency | 10/10 questions with proactive caveats | 2/10 questions | +8 questions |
 | Snowflake Credits | 6.11 total (10 questions) | N/A | -- |
 
@@ -93,7 +93,7 @@ Cortex is 100% grounded -- every factual claim traces to a SQL result or cited d
    - G09: Fabricated "regulatory implications" and "typical OCC remediation requirements"
    - G10: Fabricated consent order capital targets
 
-2. **Wrong corpus retrieval (13 instances):** Every KA call returned Meridian Capital insider trading docs instead of PNB CRE banking docs. The KA was connected to the wrong volume or index.
+2. **Wrong corpus retrieval (13 instances):** Every KA call returned results from the previous legal benchmark corpus (Meridian Capital insider trading docs) instead of the CRE banking documents. The Knowledge Assistant was connected to the wrong document volume -- a configuration error during setup, not a platform limitation. This single misconfiguration cascaded into accuracy and groundedness failures on every question requiring document context.
 
 3. **SQL aggregation errors (5 instances):** Join fan-out on provision table (G03: $67.2B instead of ~$13.6B) and wrong exposure figures (G01: $4.26B instead of $167B from using concentration table instead of loan table).
 
@@ -171,7 +171,7 @@ Databricks' cumulative context growth is visible: G01 uses 38K tokens, but by G0
 
 | Failure Type | Count | Impact |
 |---|---|---|
-| KA returned wrong corpus | 13 | 100% KA failure rate -- every doc search returned Meridian Capital legal docs |
+| KA returned wrong corpus | 13 | Configuration error -- KA pointed at legal benchmark volume instead of CRE volume |
 | Genie SQL returned EMPTY or wrong | 5 | Queries for nonexistent data (DSCR covenants, NOI table, etc.) |
 | Genie timeout | 1 | G08 exceeded 292s, needed manual "continue" |
 | **Total** | **19** | |
@@ -186,9 +186,9 @@ This is the single largest differentiator.
 |---|---|---|
 | Queries attempted | 5 | 13 |
 | Successful retrievals | 5 (100%) | 0 (0%) |
-| Documents found | SR 07-1, Consent Order, ALLL memo, workout proposal, borrower financials, audit report, stress test, capital plan, examiner report | None -- all 13 calls returned Meridian Capital legal docs |
+| Documents found | SR 07-1, Consent Order, ALLL memo, workout proposal, borrower financials, audit report, stress test, capital plan, examiner report | None -- KA was connected to wrong document volume (returned legal benchmark docs instead of CRE docs) |
 
-**Root cause:** Databricks' Knowledge Assistant was connected to the wrong volume or index. Every KA call returned documents from the legal benchmark (Meridian Capital insider trading case), not the CRE benchmark (PNB banking docs). This caused cascading failures: the supervisor couldn't get document context, so it either admitted gaps or backfilled with fabricated general knowledge.
+**Root cause:** The Databricks Knowledge Assistant was connected to the wrong document volume during setup -- it was pointed at the previous legal benchmark corpus instead of the CRE banking documents. This is a configuration error, not a platform limitation. Every KA call returned results from the Meridian Capital legal case documents, which had no relevance to the CRE banking questions. Because the supervisor agent couldn't get relevant document context, it either admitted gaps or backfilled with general knowledge.
 
 Cortex Search successfully retrieved every document on the first attempt, including complex queries spanning multiple documents (e.g., ALLL methodology + Consent Order + examiner report in a single search).
 
@@ -227,7 +227,7 @@ This level of analytical transparency is critical for banking work where silent 
 
 1. **Semantic View with VQRs** provides rich schema guidance that eliminates code-guessing. Snowflake's Semantic View defines column decode mappings, relationships, and verified queries as a single governed object. Databricks' knowledge store offers similar capabilities (SQL expressions, example SQL, synonyms) but requires separate curation per Genie Agent rather than a centralized semantic layer. The SQL errors observed (wrong table in G01, fan-out in G03) reflect gaps in schema guidance available to the agent at query time.
 
-2. **Cortex Search retrieves from the correct corpus.** The same 30 documents were uploaded to both platforms. Cortex Search found every document on the first call. Databricks' KA returned the wrong corpus 13/13 times.
+2. **Cortex Search retrieves from the correct corpus.** The same 30 documents were uploaded to both platforms. Cortex Search found every document on the first call. The Databricks Knowledge Assistant was connected to the wrong document volume (a setup error), so its retrieval failures reflect misconfiguration rather than a platform limitation. A correctly configured KA would be expected to retrieve relevant documents.
 
 3. **Parallel tool invocation** lets Cortex fire SQL and Search simultaneously. Databricks' supervisor routes sequentially -- one child agent at a time -- compounding latency when retries occur.
 
@@ -243,6 +243,6 @@ This level of analytical transparency is critical for banking work where silent 
 
 Across 10 complex multi-part banking queries, **Cortex Agent achieves 95% accuracy with 100% groundedness, at 6.2x faster latency and 2.1x fewer tool calls** compared to Databricks Genie, for a total cost of 6.11 Snowflake credits.
 
-The most critical finding is Databricks' **complete document retrieval failure** (0/13 KA calls successful), which cascaded into hallucinated general-knowledge answers, fabricated regulatory citations, and missed sub-parts on 7 of 10 questions. On purely SQL-based questions (G04, G06), Databricks performed competitively -- the gap is driven by the hybrid SQL+document questions that represent real-world banking analyst workflows.
+A significant factor in the results is the **document retrieval failure** (0/13 KA calls successful), caused by the Knowledge Assistant being connected to the wrong document volume during setup. This configuration error cascaded into general-knowledge backfill, fabricated citations, and missed sub-parts on 7 of 10 questions. On purely SQL-based questions (G04, G06), Databricks performed competitively -- the gap is driven by the hybrid SQL+document questions that represent real-world banking analyst workflows. A re-run with the correctly configured KA volume would be needed to isolate the document retrieval comparison.
 
 When the question is "did the agent get the banking facts right, grounded in the data and regulatory documents?", Cortex wins decisively.
