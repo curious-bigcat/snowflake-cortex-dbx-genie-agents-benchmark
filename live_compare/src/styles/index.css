@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+@theme {
+  --color-sf-blue: #29B5E8;
+  --color-sf-blue-dark: #1a8ab5;
+  --color-dbx-red: #FF3621;
+  --color-dbx-red-dark: #cc2b1a;
+  --color-surface: #111827;
+  --color-surface-light: #1f2937;
+  --color-surface-lighter: #374151;
+  --color-border: #374151;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.animate-pulse-dot {
+  animation: pulse-dot 1.5s ease-in-out infinite;
+}
+
+@keyframes typing {
+  from { opacity: 0.6; }
+  to { opacity: 1; }
+}
+
+.typing-cursor::after {
+  content: '\25AE';
+  animation: typing 0.8s ease-in-out infinite alternate;
+  margin-left: 2px;
+  color: var(--color-sf-blue);
+}
+
+.markdown-body h1, .markdown-body h2, .markdown-body h3 {
+  font-weight: 600;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+  color: #f3f4f6;
+}
+.markdown-body h1 { font-size: 1.5rem; }
+.markdown-body h2 { font-size: 1.3rem; }
+.markdown-body h3 { font-size: 1.15rem; }
+
+.markdown-body p {
+  margin-bottom: 0.75em;
+  line-height: 1.7;
+  font-size: 1.05rem;
+}
+
+.markdown-body ul, .markdown-body ol {
+  margin-left: 1.25em;
+  margin-bottom: 0.75em;
+}
+.markdown-body li { margin-bottom: 0.25em; font-size: 1.05rem; }
+
+.markdown-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.75em 0;
+  font-size: 0.95rem;
+}
+.markdown-body th {
+  background: #1f2937;
+  padding: 0.5em 0.75em;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 2px solid #374151;
+}
+.markdown-body td {
+  padding: 0.4em 0.75em;
+  border-bottom: 1px solid #1f2937;
+}
+.markdown-body tr:hover td {
+  background: #111827;
+}
+
+.markdown-body code {
+  background: #1f2937;
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+.markdown-body pre {
+  background: #0d1117;
+  padding: 1em;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 0.75em 0;
+}
+.markdown-body pre code {
+  background: none;
+  padding: 0;
+}
+
+.markdown-body strong { color: #e5e7eb; }
+
+.scrollbar-thin::-webkit-scrollbar { width: 6px; }
+.scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+.scrollbar-thin::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 3px; }
+.scrollbar-thin::-webkit-scrollbar-thumb:hover { background: #6b7280; }
