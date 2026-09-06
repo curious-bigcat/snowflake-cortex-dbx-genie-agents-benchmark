@@ -40,3 +40,4 @@ live_compare/dist/
 # Environment variables
 .env
 .env.*
+reports/blog_cortex_vs_genie.md
