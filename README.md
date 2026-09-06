@@ -16,7 +16,7 @@ Comparative benchmark of **Snowflake Cortex Agent** vs **Databricks Genie** on c
 
 | Metric | Cortex Agent | Databricks Genie | Delta |
 |---|---|---|---|
-| Accuracy | 95.7% (45/47 sub-parts) | 82.2% (37/45 sub-parts) | +13.5pp |
+| Accuracy | 100% (48/48 sub-parts) | 84.4% (40.5/48 sub-parts) | +15.6pp |
 | Groundedness | 100% (0 hallucinations) | ~89% (~13 ungrounded claims) | +11pp |
 | Avg Latency | 41s | 173s | 4.2x faster |
 | Tool Calls | 35 | 59 | 1.7x fewer |
@@ -24,7 +24,7 @@ Comparative benchmark of **Snowflake Cortex Agent** vs **Databricks Genie** on c
 | Doc Retrieval | 100% (5/5) | 85% (11/13) | +15pp |
 | LLM-as-Judge (automated) | 45.1/50 (90%) | 26.2/50 (52%) | 10-0 sweep |
 
-All metrics measured using each platform's native observability: Snowflake via account usage views, Databricks via agent trace spans. Both capture wall-clock latency, token consumption, and tool call activity. The LLM-as-Judge evaluation uses Claude Sonnet (`claude-sonnet-4-5`, temperature=0) scoring both responses against verified ground truth across 5 dimensions (Accuracy, Groundedness, Relevance, Actionability, Visual Richness). See `reports/cre_benchmark_report.md` for full methodology, per-question detail, and user experience analysis.
+All metrics measured using each platform's native observability: Snowflake via account usage views, Databricks via agent trace spans. Both capture wall-clock latency, token consumption, and tool call activity. The LLM-as-Judge evaluation uses Claude Sonnet (`claude-sonnet-4-5`, temperature=0) scoring both responses against verified ground truth across 5 dimensions (Accuracy, Groundedness, Relevance, Actionability, Visual Richness). See `reports/cre_benchmark_report_v2.md` for full methodology, per-question detail, and user experience analysis.
 
 ## Repository Structure
 
