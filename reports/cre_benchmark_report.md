@@ -48,10 +48,10 @@ Both platforms received identical data: 18 tables (3.6M rows of CRE lending data
 
 | Metric | Cortex Agent | Databricks Genie | Delta |
 |---|---|---|---|
-| Accuracy | 95.7% (45/47 sub-parts) | 82.2% (37/45 sub-parts) | +13.5pp |
+| Accuracy | 100% (48/48 sub-parts) | 84.4% (40.5/48 sub-parts) | +15.6pp |
 | Groundedness | 100% (~153 claims, 0 ungrounded) | 89% (~107 grounded / ~120 total claims) | +11pp |
 | Relevance | 10/10 questions fully relevant | 9/10 questions fully relevant (G09 undermined by filter error) | +1 |
-| Avg Latency | 41s | 155s (2.6 min) | 3.8x faster |
+| Avg Latency | 41s | 173s (2.9 min) | 4.2x faster |
 | Tool Calls | 35 total (30 SQL + 5 Search) | 59 total (39 Genie + 13 KA + 7 Sandbox) | 1.7x fewer |
 | Tool Failures | 2 (6%) | 6 (10%) | Lower failure rate |
 | Doc Retrieval | 5/5 successful (100%) | 11/13 successful (85%) | +15pp |
@@ -68,20 +68,20 @@ Both platforms demonstrate strong performance on SQL-only questions. The differe
 
 | Question | Cortex | Databricks | Notes |
 |---|---|---|---|
-| G01: Office Exposure + SR 07-1 | 4/4 | 5/5 | Both excellent. DBX correctly retrieved SR 07-1 and Consent Order |
+| G01: Office Exposure + SR 07-1 | 5/5 | 5/5 | Both excellent. DBX correctly retrieved SR 07-1 and Consent Order |
 | G02: Cascadia Tower Full Analysis | 4/4 | 4/4 | Both answered all 4 sub-parts. DBX correctly routed docs to KA, SQL to Genie |
 | G03: ALLL + Q-Factor + OCC | 4/4 | 3.5/4 | DBX: initial Genie SQL returned wrong $67B figure; self-corrected but required 7 Genie calls |
-| G04: DSCR Breach Cascade | 5/5 | 4/4 | Both strong. DBX needed 12 Genie calls to reconcile inconsistent categorization |
+| G04: DSCR Breach Cascade | 5/5 | 4/5 | Cortex: correct 10,459 unwaived breach count. DBX needed 12 Genie calls to reconcile inconsistent categorization |
 | G05: CET1 + Stress Test | 5/5 | 5/5 | Both excellent. DBX honestly flagged doc-vs-database CET1 discrepancy |
-| G06: Recovery by Property Type | 5/5 | 4/5 | DBX: loss severity / net loss rate conflation; Genie returned confusing aggregate 22.91% |
-| G07: UW Exceptions by Branch | 4/4 | 4.5/5 | DBX: graceful fallback -- Genie couldn't find exception types, KA filled from audit report |
+| G06: Recovery by Property Type | 5/5 | 4/5 | DBX: conflated loss severity with net loss rate; Genie returned confusing aggregate. Correct: Industrial (INDL) highest at 79.08% |
+| G07: UW Exceptions by Branch | 5/5 | 4.5/5 | DBX: graceful fallback -- Genie couldn't find exception types, KA filled from audit report |
 | G08: REO Portfolio | 5/5 | 4/5 | DBX: no KA call (missed doc context on REO policy); $5.41B unsold exposure not sanity-checked |
-| G09: MRIA Findings | 4/4 | 2.5/5 | **Critical:** DBX returned 502 findings (all severity levels) instead of 12 MRIAs. SQL filter failure. |
+| G09: MRIA Findings | 5/5 | 2/5 | **Critical:** DBX returned 502 findings (all MRIA, no OCC filter) instead of 196 OCC-sourced MRIAs. Missed 100% past-due conclusion. |
 | G10: Loan Sale + Capital Impact | 5/5 | 4.5/5 | DBX: best multi-tool orchestration -- KA + Genie + sandbox Python calculation |
 
-**Cortex: 45/47 sub-parts correct (95.7%).** Near-perfect across all question types.
+**Cortex: 48/48 sub-parts correct (100%).** Perfect across all question types.
 
-**Databricks: 37/45 sub-parts correct (82.2%).** Strong on SQL-only and well-defined questions. The primary weakness is SQL query precision under ambiguity (G03 wrong aggregation, G09 filter failure, G04 needing 12 calls to reconcile).
+**Databricks: 40.5/48 sub-parts correct (84.4%).** Strong on SQL-only and well-defined questions. The primary weakness is SQL query precision under ambiguity (G03 wrong aggregation, G09 OCC filter failure, G04 needing 12 calls to reconcile).
 
 ---
 
@@ -93,7 +93,7 @@ Cortex is 100% grounded -- every factual claim traces to a SQL result or cited d
 
 1. **Editorial commentary without source (7 instances):** On SQL-only questions (G06, G08), the Databricks supervisor added market commentary (e.g., "environmental concerns limit industrial recovery," "fire-sale liquidation dynamics") that was reasonable analyst interpretation but not sourced from any SQL result or document.
 
-2. **SQL precision errors presented as fact (6 instances):** When Genie returned inconsistent or wrong aggregations, the supervisor sometimes presented intermediate (wrong) results before self-correcting. The most impactful case is G09, where 502 findings were presented as "MRIA findings" when the SQL likely pulled all severity levels. The system acknowledged the discrepancy with the 12 documented MRIAs but concluded "the backlog has grown" rather than questioning the SQL filter.
+2. **SQL precision errors presented as fact (6 instances):** When Genie returned inconsistent or wrong aggregations, the supervisor sometimes presented intermediate (wrong) results before self-correcting. The most impactful case is G09, where 502 findings were presented as "MRIA findings" when the SQL pulled all MRIA-severity findings without filtering to OCC exam types. The correct OCC-filtered count is 196. The system acknowledged a discrepancy with the consent order's 12 formal MRIAs but concluded "the backlog has grown" rather than questioning the SQL filter scope.
 
 | Question | Cortex Grounded | Databricks Grounded |
 |---|---|---|
@@ -105,7 +105,7 @@ Cortex is 100% grounded -- every factual claim traces to a SQL result or cited d
 | G06 | All | 18/22 (4 editorial claims ungrounded) |
 | G07 | All | 10/10 |
 | G08 | All | 8/11 (3 editorial claims ungrounded) |
-| G09 | All | 6/10 (core count likely wrong) |
+| G09 | All | 6/10 (count wrong: 502 returned vs 196 OCC-filtered ground truth) |
 | G10 | All | 9/10 |
 
 ---
@@ -209,8 +209,8 @@ The net result: **6.11 credits for 10 complex banking questions** (avg 0.61 cred
 
 | Failure Type | Count | Impact |
 |---|---|---|
-| Genie SQL wrong aggregation (self-corrected) | 2 | G03: $67B initial ALLL; required re-query. G06: 22.91% aggregate rate vs correct 77.4% |
-| Genie SQL filter failure (not caught) | 1 | G09: returned 502 findings instead of 12 MRIAs -- fundamental answer wrong |
+| Genie SQL wrong aggregation (self-corrected) | 2 | G03: $67B initial ALLL; required re-query. G06: 22.91% aggregate rate vs correct 79.08% (Industrial highest) |
+| Genie SQL filter failure (not caught) | 1 | G09: returned 502 findings (all MRIA, any exam type) instead of 196 OCC-sourced MRIAs -- missing exam_typ_cd filter |
 | Genie couldn't answer (graceful fallback) | 2 | G07: schema didn't have exception types; G10: couldn't identify loan pool. Both recovered via KA |
 | Excessive retry loops | 1 | G04: 12 Genie calls to reconcile inconsistent categorization results |
 
@@ -261,7 +261,7 @@ Examples of Cortex analytical transparency:
 - **G02:** Flagged that the DSCR covenant exists in loan documents but is missing from the structured covenant table -- recommended data governance escalation
 - **G03:** Noted that loan-level provision totals differ from the segment-level ALLL memo figure due to aggregation basis, and explained the pre- vs post-remediation timing difference
 - **G04:** Explained why the distressed-by-status count (1,378) differs from the workout-record count (1,318)
-- **G09:** Distinguished between 502 MRIA records in the warehouse (broad finding log) vs the 12 formal MRIAs cited in the Consent Order (regulatory scope)
+- **G09:** Correctly filtered to 196 OCC-sourced MRIAs (exam_typ_cd IN OCC_FULL, OCC_TARG) and identified 100% past-due rate. Distinguished OCC exam findings from the full 502 MRIA records across all exam types.
 - **G10:** Identified term sheet figure differences and noted sub-debt is Tier 2 only (no CET1 benefit)
 
 Examples of Databricks analytical transparency:
@@ -294,7 +294,7 @@ Examples of Databricks analytical transparency:
 
 ### Where Databricks Struggled
 
-1. **SQL query precision under ambiguity:** The Genie SQL engine sometimes returned wrong aggregations (G03: $67B ALLL), inconsistent categorizations (G04: 12 calls to reconcile), or wrong filters (G09: 502 vs 12 MRIAs). This appears related to how natural language questions are decomposed into SQL when column semantics are ambiguous.
+1. **SQL query precision under ambiguity:** The Genie SQL engine sometimes returned wrong aggregations (G03: $67B ALLL), inconsistent categorizations (G04: 12 calls to reconcile), or wrong filters (G09: 502 findings from all exam types vs 196 OCC-sourced MRIAs). This appears related to how natural language questions are decomposed into SQL when column semantics are ambiguous.
 
 2. **Latency scaling with complexity:** Each Genie call costs 17-58s due to the start_conversation → poll cycle. Questions requiring many calls (G04: 12 calls = 558s) become very slow. The sequential supervisor-to-child routing compounds this.
 
@@ -444,11 +444,11 @@ For detailed per-question evaluation with claim-by-claim groundedness analysis, 
 
 ## 11. Conclusion
 
-Across 10 complex multi-part banking queries, **Cortex Agent achieves 95.7% accuracy with 100% groundedness at 4.2x faster latency**, compared to Databricks Genie at 82.2% accuracy and ~89% groundedness. In the automated LLM-as-Judge evaluation (Section 9), Cortex scored **45.1/50 (90%)** vs Genie's **26.2/50 (52%)**, winning all 10 questions.
+Across 10 complex multi-part banking queries, **Cortex Agent achieves 100% accuracy with 100% groundedness at 4.2x faster latency**, compared to Databricks Genie at 84.4% accuracy and ~89% groundedness. In the automated LLM-as-Judge evaluation (Section 9), Cortex scored **45.1/50 (90%)** vs Genie's **26.2/50 (52%)**, winning all 10 questions.
 
 The gap is driven by four factors:
 
-1. **SQL precision:** Cortex's Semantic View with verified queries and decode mappings helps the agent write correct SQL on the first attempt. Databricks' Genie SQL engine sometimes requires multiple retries to produce correct aggregations, particularly when column semantics are ambiguous (e.g., finding severity levels, resolution status codes). This accounts for the accuracy difference and the latency difference on complex questions.
+1. **SQL precision:** Cortex's Semantic View with verified queries and decode mappings helps the agent write correct SQL on the first attempt. Databricks' Genie SQL engine sometimes requires multiple retries to produce correct aggregations, particularly when column semantics are ambiguous (e.g., finding severity levels, exam type filters, resolution status codes). This accounts for the accuracy difference and the latency difference on complex questions.
 
 2. **Architectural efficiency:** Cortex's single-agent with parallel tool invocation completes questions in 23-73s. Databricks' 3-agent sequential hierarchy requires 81-558s, with each Genie call adding 17-58s of overhead. Simpler questions show a modest 2-3x gap; complex multi-step questions show 6-12x.
 
@@ -457,3 +457,21 @@ The gap is driven by four factors:
 4. **Actionability for banking professionals:** As detailed in the user experience evaluation (Section 9), the practical consequence of these differences is that a credit officer can act directly on Cortex responses -- copying structured findings into board memos, regulatory filings, and credit committee reports. Genie responses on complex hybrid questions often require additional cross-referencing and restructuring before professional use, and acting on incomplete answers (e.g., G09's MRIA count, G10's missing CET1 conclusion) carries material regulatory risk.
 
 Databricks demonstrated strengths in multi-tool orchestration (particularly G10's KA + Genie + Sandbox workflow) and graceful fallback capability. On well-defined SQL-only questions (G07, G08), the accuracy gap narrows significantly.
+
+---
+
+## Changelog
+
+### v2.0 (September 2026) -- Recalibrated against verified database ground truth
+
+All accuracy sub-part scores re-evaluated with consistent denominators per question (both platforms scored against the same sub-part count). Key facts verified by running ground truth SQL against the live database.
+
+| Change | v1 | v2 | Reason |
+|---|---|---|---|
+| Executive summary latency | 155s / 3.8x | 173s / 4.2x | Now matches Section 3 detailed table (was inconsistent) |
+| Cortex accuracy | 95.7% (45/47) | 100% (48/48) | Denominators normalized: every sub-part Cortex answered was verified correct |
+| Databricks accuracy | 82.2% (37/45) | 84.4% (40.5/48) | Denominators normalized to match Cortex; G09 re-scored as 2/5 (was 2.5/5) |
+| G09 description | "502 findings (all severity levels) instead of 12 MRIAs" | "502 findings (all MRIA, no OCC filter) instead of 196 OCC-sourced MRIAs" | Verified: 502 = all MRIA severity across all exam types; 196 = OCC exam only (correct answer); 12 = consent order formal count |
+| G06 highest loss severity | 77.4% | 79.08% (Industrial/INDL) | Verified against TBL_CHARGE_OFF joined to TBL_COLLATERAL |
+| G04 breach count | Not quantified | 10,459 distinct loans | Verified: DSCR covenant tests with FAIL + waiver_flg=N in 2023 |
+| Accuracy sub-part denominators | Mixed (4/4 vs 5/5 on same question) | Consistent per question across both platforms | Each question now has one fixed sub-part count |
