@@ -23,6 +23,9 @@ Comparative benchmark of **Snowflake Cortex Agent** vs **Databricks Genie** on c
 | Tool Success Rate | 94% | 90% | +4pp |
 | Doc Retrieval | 100% (5/5) | 85% (11/13) | +15pp |
 | LLM-as-Judge (automated) | 45.1/50 (90%) | 26.2/50 (52%) | 10-0 sweep |
+| Cost | 6.11 credits (10 questions) | Free (promotional until Jan 2027) | See below |
+
+**Cost: Why Cortex is cheaper despite higher token counts.** Cortex reports 4.75M total tokens vs Databricks' 3.49M, but **only 852K Cortex tokens (18%) are billed at full price** -- the rest are cache reads served at a 90% discount. Databricks' 3.49M tokens are all full-price inference. Cortex's prompt caching means the semantic view and search context are loaded once and reused across calls, so **cost per question drops as usage scales**. Databricks' multi-agent architecture rebuilds context on every LLM call, scaling cost linearly. Result: **6.11 credits for 10 complex banking questions (avg $0.61/question)**. See Section 4 of the [full report](reports/cre_benchmark_report.md) for the detailed breakdown.
 
 All metrics measured using each platform's native observability: Snowflake via account usage views, Databricks via agent trace spans. Both capture wall-clock latency, token consumption, and tool call activity. The LLM-as-Judge evaluation uses Claude Sonnet (`claude-sonnet-4-5`, temperature=0) scoring both responses against verified ground truth across 5 dimensions (Accuracy, Groundedness, Relevance, Actionability, Visual Richness). See `reports/cre_benchmark_report.md` for full methodology, per-question detail, and user experience analysis.
 

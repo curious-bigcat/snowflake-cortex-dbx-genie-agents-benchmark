@@ -187,6 +187,24 @@ Cortex Agent leverages prompt caching to keep costs low even with large context 
 
 The net result: **6.11 credits for 10 complex banking questions** (avg 0.61 credits/question). The cache mechanism means the cost per additional question decreases as more of the semantic view and search context is cached.
 
+### Why Cortex Is Cheaper in Practice Despite Higher Token Counts
+
+**Cortex reports 4.75M total tokens vs Databricks' 3.49M -- but Cortex costs less to run.** The reason is architectural: Cortex's token count includes cached context (the semantic view, search index, and system prompt) that is served from memory at a 90% discount on every call. **Only 852K tokens (18%) are billed at full price.** The remaining 3.90M are cache reads that cost a fraction of a full inference call.
+
+**Databricks' 3.49M tokens are all processed at full inference cost** -- the supervisor agent rebuilds its context from scratch on every LLM call within a question, carrying all prior tool outputs forward. There is no cross-call caching mechanism analogous to Cortex's prompt cache. When the current promotional free period ends (January 31, 2027), every one of those 3.49M tokens will be billed at the standard per-token rate for the underlying models.
+
+**The practical cost comparison:**
+
+| | Cortex Agent | Databricks Genie |
+|---|---|---|
+| **Total tokens reported** | 4.75M | 3.49M |
+| **Tokens at full price** | **852K (18%)** | **3.49M (100%)** |
+| **Tokens at 90% discount** | 3.90M (82%) | 0 |
+| **Measured cost** | 6.11 credits | Free (promotional period) |
+| **Effective cost per question** | 0.61 credits | TBD post-January 2027 |
+
+**In a production deployment processing hundreds of questions per day, Cortex's cache advantage compounds:** the semantic view and search context are loaded once and reused indefinitely, meaning marginal cost per question drops as usage scales. Databricks' sequential multi-agent architecture rebuilds context on every supervisor LLM call, so cost scales linearly with usage.
+
 ---
 
 ## 5. Tool Call Efficiency
