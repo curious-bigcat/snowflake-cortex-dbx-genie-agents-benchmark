@@ -45,3 +45,4 @@ reports/blog_cortex_vs_genie.md
 # Benchmark files (not ready for public)
 questions/cre_benchmark_questions.md
 reports/cre_benchmark_report.md
+data/cre/verify_ground_truth.py
