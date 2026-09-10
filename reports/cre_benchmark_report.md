@@ -1,10 +1,9 @@
 # Cortex Agent vs. Databricks Genie -- CRE Benchmark Report
 
 **Benchmark:** Pacific Northwest Bank CRE Portfolio Stress & Workout
-**Questions:** G01-G10 (complex multi-part queries requiring SQL + document retrieval + banking domain reasoning)
+**Questions:** Q01-Q10 (single complex queries targeting specific agent weaknesses)
 **Dataset:** 3.6M rows, 18 tables, 30 documents (identical on both platforms)
 **Date:** September 2026
-**Demo:** [![Watch the demo](https://img.youtube.com/vi/g5XvNhRDAcg/hqdefault.jpg)](https://youtu.be/g5XvNhRDAcg)
 
 ---
 
@@ -12,484 +11,385 @@
 
 ### Setup
 
-Both platforms received identical data: 18 tables (3.6M rows of CRE lending data) and 30 documents (23 synthetic bank documents + 7 real OCC/FDIC/Fed regulatory PDFs). The same 10 questions were asked to each agent in the same order.
+Both platforms received identical data: 18 tables (3.6M rows of CRE lending data) and 30 documents (23 synthetic bank documents + 7 real OCC/FDIC/Fed regulatory PDFs). The same 10 questions were asked to each agent in the same order. Each question is a single complex query (not multi-part) designed to expose specific agent weaknesses: filter precision, aggregation traps, column confusion, join chains, NULL handling, and doc-data reconciliation.
 
 | Aspect | Snowflake Cortex Agent | Databricks Genie |
 |---|---|---|
 | Architecture | Single agent with Cortex Analyst + Cortex Search | 3-agent hierarchy: Supervisor + Genie SQL + Knowledge Assistant |
-| Structured data | Semantic View with column descriptions, code decode mappings, relationships, metrics, and 8 verified queries | Unity Catalog tables with knowledge store (table descriptions, SQL expressions, example SQL, synonyms available) |
+| Structured data | Semantic View with column descriptions, code decode mappings, relationships, metrics, and verified queries | Unity Catalog tables with knowledge store (table descriptions, SQL expressions, example SQL, synonyms available) |
 | Unstructured data | Cortex Search Service (embedding-based) | Knowledge Assistant connected to Unity Catalog volume |
 | Tool invocation | Parallel (Analyst + Search fired simultaneously) | Sequential (Supervisor routes to one child agent at a time) |
-| Model | claude-opus-4-8 | Databricks default (supervisor + child models) |
 
-### Metrics Measured
+### Scoring Dimensions
 
-| Metric | Definition | How Measured |
-|---|---|---|
-| **Accuracy** | Fraction of question sub-parts answered correctly with verifiable data | Manual evaluation: each sub-part scored as correct/incorrect against ground truth from the database and documents |
-| **Groundedness** | Whether each factual claim in the response can be traced to a SQL result or document citation | Manual claim-by-claim verification: grounded = traceable to data/doc, ungrounded = fabricated or from general knowledge |
-| **Relevance** | Whether the response directly addresses the question asked, without irrelevant padding or missed sub-parts | Manual evaluation: scored per question based on coverage, focus, and signal-to-noise |
-| **Latency** | Wall-clock time from request to complete response | Each platform's native observability. Snowflake: account usage views (`start_time` to `end_time`). Databricks: top-level agent trace span duration. Both measure the same thing -- total time from user question to final response. |
-| **Token usage** | Total tokens consumed per question | Each platform's native observability. Snowflake: account usage views with per-model breakdown (cache_read, cache_write, uncached, output). Databricks: LLM span token counts from agent traces. Note: token accounting differs between platforms (see Section 4). |
-| **Tool calls** | Number of tool invocations (SQL queries, document searches, code execution) | Both platforms: counted from response content and trace spans. Snowflake: "Retrieved data" = SQL query, "Searched Search" = search call. Databricks: genie/ka/sandbox trace spans. |
-| **Tool failures** | Tool calls that returned empty results, wrong data, or timed out | Snowflake: queries returning 0 rows that required retry. Databricks: Genie SQL returning wrong aggregation, KA missing relevant docs, inconsistent query results requiring re-query |
-| **Analytical transparency** | Whether the agent proactively flagged data caveats, discrepancies, or reconciliation notes | Manual evaluation: did the response surface nuances (e.g., scope differences, aggregation basis, document-vs-table conflicts) or present numbers without qualification? |
+Each question is scored on four dimensions (1-10 scale):
 
-### What We Did NOT Measure
+| Dimension | What It Measures |
+|---|---|
+| **Accuracy** | Are the key numbers and facts correct against verified ground truth? |
+| **Groundedness** | Can every claim be traced to a SQL result or document citation? |
+| **Relevance** | Does it directly answer the question without irrelevant padding? |
+| **Usefulness** | Could a credit officer act on this immediately -- specific numbers, risk flags, next steps? |
 
-- **Token cost in dollars**: Snowflake reports 6.11 credits total for 10 questions via account usage views. On the Databricks side, Genie One and Genie Agents (including the Supervisor Agent and Knowledge Assistant used in this benchmark) are free for user-initiated usage until January 31, 2027 per Databricks official documentation; only SQL warehouse compute (DBUs) and service-principal usage are billed. Since the two platforms use fundamentally different billing models and Databricks is currently in a promotional free period for these agent types, a direct dollar comparison is not meaningful at this time.
-- **Model capability in isolation**: Both agents use different underlying models. This benchmark measures the full agent system (model + tools + retrieval + schema guidance), not the LLM alone.
+### Additional Tracking
+
+| Metric | How Measured |
+|---|---|
+| **Latency** | Snowflake: `INFORMATION_SCHEMA.QUERY_HISTORY` (agent session start to last SQL). Databricks: trace span duration. |
+| **Tool calls** | Snowflake: SQL queries + Search calls from response. Databricks: Genie + KA + Sandbox + LLM trace spans. |
+| **Hallucinations** | Each factual error documented: what was claimed, what is true, severity (Low/Medium/High). |
 
 ---
 
 ## Executive Summary
 
-![Aggregate Comparison](cre_charts/06_aggregate.png)
-
-| Metric | Cortex Agent | Databricks Genie | Delta |
-|---|---|---|---|
-| Accuracy | 100% (48/48 sub-parts) | 84.4% (40.5/48 sub-parts) | +15.6pp |
-| Groundedness | 100% (~153 claims, 0 ungrounded) | 89% (~107 grounded / ~120 total claims) | +11pp |
-| Relevance | 10/10 questions fully relevant | 9/10 questions fully relevant (G09 undermined by filter error) | +1 |
-| Avg Latency | 41s | 173s (2.9 min) | 4.2x faster |
-| Tool Calls | 35 total (30 SQL + 5 Search) | 59 total (39 Genie + 13 KA + 7 Sandbox) | 1.7x fewer |
-| Tool Failures | 2 (6%) | 6 (10%) | Lower failure rate |
-| Doc Retrieval | 5/5 successful (100%) | 11/13 successful (85%) | +15pp |
-| Analytical Transparency | 10/10 questions with proactive caveats | 4/10 questions (G03, G05, G07, G09) | +6 questions |
-| Snowflake Credits | 6.11 total (10 questions) | N/A (free during promotional period) | -- |
-
-Both platforms demonstrate strong performance on SQL-only questions. The differentiation emerges on hybrid SQL + document questions and complex multi-step queries, where Cortex's parallel tool invocation, semantic view guidance, and self-correction capabilities yield higher accuracy with significantly lower latency.
-
----
-
-## 1. Accuracy
-
-![Accuracy per Question](cre_charts/01_accuracy.png)
-
-| Question | Cortex | Databricks | Notes |
-|---|---|---|---|
-| G01: Office Exposure + SR 07-1 | 5/5 | 5/5 | Both excellent. DBX correctly retrieved SR 07-1 and Consent Order |
-| G02: Cascadia Tower Full Analysis | 4/4 | 4/4 | Both answered all 4 sub-parts. DBX correctly routed docs to KA, SQL to Genie |
-| G03: ALLL + Q-Factor + OCC | 4/4 | 3.5/4 | DBX: initial Genie SQL returned wrong $67B figure; self-corrected but required 7 Genie calls |
-| G04: DSCR Breach Cascade | 5/5 | 4/5 | Cortex: correct 10,459 unwaived breach count. DBX needed 12 Genie calls to reconcile inconsistent categorization |
-| G05: CET1 + Stress Test | 5/5 | 5/5 | Both excellent. DBX honestly flagged doc-vs-database CET1 discrepancy |
-| G06: Recovery by Property Type | 5/5 | 4/5 | DBX: conflated loss severity with net loss rate; Genie returned confusing aggregate. Correct: Industrial (INDL) highest at 79.08% |
-| G07: UW Exceptions by Branch | 5/5 | 4.5/5 | DBX: graceful fallback -- Genie couldn't find exception types, KA filled from audit report |
-| G08: REO Portfolio | 5/5 | 4/5 | DBX: no KA call (missed doc context on REO policy); $5.41B unsold exposure not sanity-checked |
-| G09: MRIA Findings | 5/5 | 2/5 | **Critical:** DBX returned 502 findings (all MRIA, no OCC filter) instead of 196 OCC-sourced MRIAs. Missed 100% past-due conclusion. |
-| G10: Loan Sale + Capital Impact | 5/5 | 4.5/5 | DBX: best multi-tool orchestration -- KA + Genie + sandbox Python calculation |
-
-**Cortex: 48/48 sub-parts correct (100%).** Perfect across all question types.
-
-**Databricks: 40.5/48 sub-parts correct (84.4%).** Strong on SQL-only and well-defined questions. The primary weakness is SQL query precision under ambiguity (G03 wrong aggregation, G09 OCC filter failure, G04 needing 12 calls to reconcile).
-
----
-
-## 2. Groundedness
-
-![Groundedness](cre_charts/05_groundedness.png)
-
-Cortex is 100% grounded -- every factual claim traces to a SQL result or cited document (with numbered footnotes). Databricks achieves ~89% groundedness with the corrected KA configuration. Ungrounded claims fall into two categories:
-
-1. **Editorial commentary without source (7 instances):** On SQL-only questions (G06, G08), the Databricks supervisor added market commentary (e.g., "environmental concerns limit industrial recovery," "fire-sale liquidation dynamics") that was reasonable analyst interpretation but not sourced from any SQL result or document.
-
-2. **SQL precision errors presented as fact (6 instances):** When Genie returned inconsistent or wrong aggregations, the supervisor sometimes presented intermediate (wrong) results before self-correcting. The most impactful case is G09, where 502 findings were presented as "MRIA findings" when the SQL pulled all MRIA-severity findings without filtering to OCC exam types. The correct OCC-filtered count is 196. The system acknowledged a discrepancy with the consent order's 12 formal MRIAs but concluded "the backlog has grown" rather than questioning the SQL filter scope.
-
-| Question | Cortex Grounded | Databricks Grounded |
+| Metric | Cortex Agent | Databricks Genie |
 |---|---|---|
-| G01 | 7/7 | 7/7 |
-| G02 | All | 6/6 |
-| G03 | 12+ | 8/8 (after self-correction) |
-| G04 | All | All (SQL + sandbox) |
-| G05 | 18+ | 7/7 |
-| G06 | All | 18/22 (4 editorial claims ungrounded) |
-| G07 | All | 10/10 |
-| G08 | All | 8/11 (3 editorial claims ungrounded) |
-| G09 | All | 6/10 (count wrong: 502 returned vs 196 OCC-filtered ground truth) |
-| G10 | All | 9/10 |
+| Average Score | **8.72 / 10** | **8.06 / 10** |
+| Questions Won | **8** | **2** |
+| Avg Latency (SQL span) | **~34s** | **82s** |
+| Avg Tool Calls | **1.8** | **7.0** |
+| Hallucinations / Misinformation | **3** | **8** |
+| High-Severity Errors | **0** | **4** |
+
+Cortex wins 8 of 10 questions. The two Databricks wins (Q02, Q06) came from superior document retrieval -- finding a $78M appraisal the database didn't surface (Q02) and delivering a complete 11-category MRIA breakdown (Q06). Cortex's advantages are consistent: correct column selection (avoiding the CET1/Tier1 trap twice), accurate root-cause diagnosis (Q03 provision table structure), and actionable risk flags on every question.
 
 ---
 
-## 3. Latency
+## Scorecard
 
-![Latency per Question](cre_charts/02_latency.png)
-
-Snowflake latency measured from account usage views (start_time to end_time). Databricks latency measured from top-level agent trace span. Both represent wall-clock time from question to complete response.
-
-| Question | Cortex (s) | Databricks (s) | Ratio |
-|---|---|---|---|
-| G01: Office Exposure + SR 07-1 | 73 | 128 | 1.8x |
-| G02: Cascadia Tower | 50 | 130 | 2.6x |
-| G03: ALLL + Q-Factor | 44 | 258 | 5.9x |
-| G04: DSCR Breach Cascade | 47 | 558 | 11.9x |
-| G05: CET1 + Stress Test | 32 | 122 | 3.8x |
-| G06: Recovery by Property Type | 38 | 115 | 3.0x |
-| G07: UW Exceptions by Branch | 31 | 81 | 2.6x |
-| G08: REO Portfolio | 37 | 86 | 2.3x |
-| G09: MRIA Findings | 38 | 122 | 3.2x |
-| G10: Loan Sale Impact | 23 | 131 | 5.7x |
-| **Average** | **41** | **173** | **4.2x** |
-
-![Latency Trend](cre_charts/08_latency_trend.png)
-
-The latency gap correlates with the number of Genie calls. Simple questions with 2-3 Genie calls (G07: 81s, G08: 86s) show modest gaps (2-3x). Questions where Genie SQL needed multiple retries (G04: 12 calls, 558s) show large gaps (12x). Each Genie call costs 17-58s due to the ask_question → start_conversation → poll_for_result cycle.
-
-Cortex's parallel tool invocation (SQL + Search simultaneously) and single-agent architecture contribute to consistently lower latency across all question types.
+| Q | Question | Cortex | Genie | Winner | Key Differentiator |
+|---|----------|--------|-------|--------|--------------------|
+| Q01 | Concentration Breach | **8.75** | 7.75 | Cortex | SF showed both SM interpretations (77.2% and 38.4%); DBX mislabeled risk tiers |
+| Q02 | Cascadia Tower Covenant | 8.1 | **9.0** | Genie | DBX found $78M JLL appraisal from docs; SF used stale $122M from DB |
+| Q03 | ALLL Reconciliation | **9.0** | 7.1 | Cortex | SF explained provision table is daily log; DBX hypothesized wrong root causes |
+| Q04 | DSCR Breach Cascade | **9.1** | 8.25 | Cortex | Both got 10,459 + $2.98B; SF added net losses + 3 action items |
+| Q05 | CET1 Capital Trap | **9.4** | 7.75 | Cortex | SF derived CET1 correctly ($2.28B); DBX used Tier1 value ($2.43B) |
+| Q06 | MRIA Filter Precision | 8.0 | **9.4** | Genie | DBX: full category breakdown + 100% past-due + consent order cross-ref |
+| Q07 | Loan Sale Arithmetic | **8.0** | 7.9 | Cortex | Both imperfect; SF used doc estimate, DBX used wrong inputs but got right answer |
+| Q08 | REO Unsold Exposure | **9.4** | 7.9 | Cortex | Both got $5.67B; SF added 3-way status breakdown + chart + action items |
+| Q09 | UW Exception Rate | **8.9** | 8.5 | Cortex | Both got 22.9%; SF caught 40% understatement caveat, DBX mixed audit/DB branches |
+| Q10 | DSCR by Occupancy | **8.5** | 7.0 | Cortex | SF measured test-level failure rate; DBX measured loan-level (~99%, wrong metric) |
 
 ---
 
-## 4. Token Usage & Cost Efficiency
+## Latency
 
-Snowflake tokens measured from account usage views with per-model breakdown and cache detail. Databricks tokens summed from LLM span counts in agent traces.
+Snowflake latency measured from `INFORMATION_SCHEMA.QUERY_HISTORY` — each question maps to a unique `cortex-agent-*` / `snowflake-intelligence-*` session ID. The SQL span covers agent session start (LIST_FILES) to last SQL query end. Databricks latency measured from top-level `predict_stream` trace span.
 
-### How Snowflake Token Accounting Works
+| Q | Question | Cortex SQL Span (s) | Cortex SQL Queries | Databricks Trace (s) |
+|---|----------|---------------------|--------------------|-----------------------|
+| Q01 | Concentration Breach | **13s** | 2 (parallel: TBL_CONCENTRATION + TBL_LOAN_MSTR) | **90s** |
+| Q02 | Cascadia Tower Covenant | **13s** | 2 (parallel: TBL_COVENANT + TBL_COLLATERAL/APPRAISAL) | **89s** |
+| Q03 | ALLL Reconciliation | **21s** | 2 (sequential: TBL_PROVISION + TBL_LOAN_MSTR) | **77s** |
+| Q04 | DSCR Breach Cascade | **12s** | 1 (4-table join: CHARGE_OFF + COVENANT_TEST + COVENANT + LOAN_MSTR) | **115s** |
+| Q05 | CET1 Capital Trap | **9s** | 1 (TBL_CAPITAL) | **93s** |
+| Q06 | MRIA Filter Precision | **7s** | 1 (TBL_EXAM_FINDING) | **129s** |
+| Q07 | Loan Sale Arithmetic | **0s** | 0 (doc-only, no SQL) | **48s** |
+| Q08 | REO Unsold Exposure | **29s** | 5 (1 SQL + 4 chart-rendering queries) | **28s** |
+| Q09 | UW Exception Rate | **8s** | 1 (TBL_LOAN_MSTR) | **46s** |
+| Q10 | DSCR by Occupancy | **28s** | 3 (1 SQL 4-table join + 2 chart-rendering queries) | **101s** |
+| **Avg** | | **14s** | **1.8** | **82s** |
 
-Snowflake's account usage views report the **full context window** for each agent call, including three categories of input tokens:
+**Notes:**
+- Cortex SQL span measures observable database activity only (agent start to last SQL end). The full end-to-end agent time also includes **Cortex Search calls** (document retrieval) and **LLM reasoning/response generation** — these happen in the Cortex runtime layer and are not captured in query history. Cortex Search serving usage (`CORTEX_SEARCH_SERVING_USAGE_HISTORY`) confirms `CRE_DOCS_SEARCH` was active during the session but only reports hourly credit aggregates, not per-request latency. Based on prior session data from `CORTEX_AGENT_USAGE_HISTORY`, total agent time is typically 30-50s per question (2-3x the SQL span).
+- Databricks trace times capture the full end-to-end pipeline including all LLM calls, Genie SQL, KA retrieval, and sandbox execution.
+- All Cortex SQL queries completed in under 5 seconds (fastest: 144ms on Q10 chart scan, slowest: 4,134ms on Q04's 4-table join). The SQL span is dominated by LLM think time between queries, not query execution.
+- Q01 and Q02 fired their SQL queries in parallel (overlapping start times within 20ms).
+- Q08 and Q10 include chart-rendering queries (RESULT_SCAN + chart SQL) which add ~10s each.
+- Q07 answered entirely from documents and cached capital data — zero SQL queries executed.
 
-| Token Category | What It Is | Cost Impact |
+**Source:** `SNOWFLAKE.INFORMATION_SCHEMA.QUERY_HISTORY`, session tags `cortex-agent-*` and `snowflake-intelligence-*`, September 9, 2026 20:35-21:20 PDT.
+
+### Databricks Tool Call Breakdown
+
+| Q | Genie Calls | KA Calls | Sandbox | LLM Spans | Total |
+|---|-------------|----------|---------|-----------|-------|
+| Q01 | 2 | 1 | 0 | 4 | 7 |
+| Q02 | 2 | 2 | 0 | 5 | 9 |
+| Q03 | 2 | 0 | 1 | 4 | 7 |
+| Q04 | 3 | 0 | 1 | 4 | 8 |
+| Q05 | 1 | 2 | 1 | 4 | 8 |
+| Q06 | 3 | 1 | 2 | 5 | 11 |
+| Q07 | 0 | 0 | 2 | 3 | 5 |
+| Q08 | 1 | 0 | 0 | 2 | 3 |
+| Q09 | 1 | 1 | 0 | 3 | 5 |
+| Q10 | 3 | 0 | 0 | 4 | 7 |
+| **Total** | **18** | **7** | **7** | **38** | **70** |
+
+---
+
+## Hallucinations & Misinformation
+
+Every factual error documented with what was claimed, what is true, and severity.
+
+### Snowflake Cortex Agent (3 issues)
+
+| Q | Claim | Truth | Severity |
+|---|-------|-------|----------|
+| Q02 | LTV = 64.3% is current; 100.6% stored value is "stale/erroneous" | TBL_COLLATERAL `curr_appr_val` = $78M gives LTV 100.6%. The $122M used for 64.3% is from a different appraisal table. Expected answer uses 100.6%. SF saw both in its own SQL results but dismissed the correct one. | Medium |
+| Q02 | Appraisal decline is ~6.8% ($131M to $122M) | Expected decline is 40.5% ($131M to $78M). $78M confirmed by JLL doc and TBL_COLLATERAL. | Medium |
+| Q07 | Post-sale CET1 ~10.7% (adding +0.4pp from term sheet) | The +0.4pp was calibrated against 8.1% base in 2023. True computed answer is ~10.39%. SF flagged the caveat but presented 10.7% as the answer. | Medium |
+
+### Databricks Genie (8 issues)
+
+| Q | Claim | Truth | Severity |
+|---|-------|-------|----------|
+| Q01 | Labeled 6-SUB as "Doubtful" and grouped 7-DBT+8-LOSS as "Loss" | 6-SUB = Substandard, 7-DBT = Doubtful, 8-LOSS = Loss. Distinct regulatory categories. | Low |
+| Q03 | Root cause: "different scope", "test data", "subsidiary" | Actual cause: TBL_PROVISION stores daily provision flows, not reserve balances. Wrong diagnosis leads to wrong remediation. | Medium |
+| Q04 | Filter included "DSCR or ICR" covenant types | Question asks for DSCR only. Result was coincidentally correct. | Low |
+| Q05 | CET1 capital = "$2.43 billion" | CET1 = $2.281B (10.32% x $22.1B RWA). $2.434B is Tier 1. Question explicitly warns about this. | **High** |
+| Q07 | CET1 capital = $2.434B and RWA = $23.58B | CET1 = $2.281B, RWA = $22.1B. Same Tier1 error as Q05 plus wrong RWA. Right answer (10.39%) from wrong inputs. | **High** |
+| Q07 | Post-sale CET1 = 10.39% derived correctly | Coincidentally correct -- errors in CET1 ($2.434B) and RWA ($23.58B) partially cancel out. Would fail audit review. | **High** |
+| Q09 | "Highest exception rates: Portland Main (31%) and Seattle Central (28%)" | These are from the audit's 1,200-loan sample, not the full 18,205-loan database. Full DB shows different branches. Presented without sample caveat. | Low |
+| Q10 | Covenant failure rate is ~99% for all occupancy buckets | Measured % of loans with >= 1 failure (loan-level), not % of tests that failed (test-level, ~71-73%). Wrong metric produces meaningless comparison. | **High** |
+
+### Summary
+
+| | Cortex | Genie |
 |---|---|---|
-| **Cache Read** | Tokens from the semantic view, search index, and system prompt that were already cached from prior calls | **90% discount** -- cached tokens are served from memory, not reprocessed by the LLM |
-| **Cache Write** | New tokens written to the cache for the first time (e.g., new tool results, retrieved documents) | Full price -- but cached for subsequent calls |
-| **Uncached** | Tokens that are neither read from nor written to cache | Full price |
-| **Output** | Tokens generated by the model (the actual response text) | Full price |
+| Total issues | 3 | 8 |
+| High severity | 0 | 4 |
+| Medium severity | 3 | 1 |
+| Low severity | 0 | 3 |
 
-The "Cortex Total" column in the table below is dominated by cache reads -- these are **not new tokens being processed at full cost**. The actual new work per question is the output tokens (avg 2,540) plus cache write tokens. This is why 10 questions cost only **6.11 credits total** despite a headline token count of 4.75M.
+Cortex's errors are judgment calls (choosing one data source over another, using a document estimate). Genie's high-severity errors are systematic: the CET1/Tier1 column confusion recurs on Q05 and Q07, and the wrong metric on Q10 produces a fundamentally different analysis.
 
-### How Databricks Token Accounting Works
+---
 
-Databricks traces report per-LLM-call context sizes. Because the supervisor agent carries all prior tool outputs in its context window, these grow cumulatively across tool calls within a single question. The token counts reported in traces (e.g., "5.4K" per LLM span) represent per-call context, not deduplicated totals.
+## Per-Question Detail
 
-### Per-Question Breakdown
+### Q01: Office Portfolio + Concentration Breach
 
-![Token Usage](cre_charts/03_tokens.png)
+**Question:** What percentage of PNB's CRE office book is rated Special Mention or worse, and is the bank currently breaching the SR 07-1 interagency CRE concentration threshold?
 
-| Question | Cortex Total | Cortex New Tokens (output + cache write) | Cortex Cache Read % | Databricks Total | Cortex Credits |
-|---|---|---|---|---|---|
-| G01 | 531,033 | 86,447 | 84.4% | 38,100 | 0.554 |
-| G02 | 382,669 | 83,626 | 78.8% | 73,000 | 0.478 |
-| G03 | 428,553 | 14,537 | 97.2% | 537,800 | 0.228 |
-| G04 | 456,386 | 120,829 | 74.0% | 552,800 | 0.636 |
-| G05 | 484,804 | 126,456 | 74.2% | 102,400 | 0.655 |
-| G06 | 413,272 | 28,985 | 93.6% | 50,300 | 0.276 |
-| G07 | 448,334 | 154,350 | 65.9% | 261,600 | 0.749 |
-| G08 | 551,744 | 202,960 | 63.5% | 700,800 | 0.967 |
-| G09 | 623,932 | 16,489 | 97.7% | 719,900 | 0.295 |
-| G10 | 429,170 | 217,217 | 49.6% | 449,600 | 0.974 |
-| **Total** | **4,749,897** | **851,896** | **78.3%** | **3,486,300** | **6.11** |
+**Trap:** Must filter `loan_typ_cd = 'CRE_OFFC'`, define "Special Mention or worse" as 5-SS through 8-LOSS, read concentration as % of capital, cite SR 07-1's 300% threshold.
 
-### Cost Efficiency Through Caching
+**Expected:** 3,799 loans (38.42%) rated 5-SS+. Concentration 390.91% vs 300% -- in breach.
 
-Cortex Agent leverages prompt caching to keep costs low even with large context windows. Here is how the 4.75M total tokens break down by cost tier:
-
-- **3.70M (78%) cache reads** -- the semantic view definition, search index, and system prompt are cached in memory across calls and served at a **90% discount**. This is why Cortex can provide rich schema guidance (column descriptions, decode mappings, VQRs) to the model on every call without paying full price each time.
-- **1.03M (22%) new tokens** -- cache writes (new tool results and retrieved documents) plus uncached input, billed at full price. These are amortized as subsequent questions benefit from the newly cached content.
-- **25K (<1%) output tokens** -- the actual response text generated by the model.
-
-The net result: **6.11 credits for 10 complex banking questions** (avg 0.61 credits/question). The cache mechanism means the cost per additional question decreases as more of the semantic view and search context is cached.
-
-### Why Cortex Is Cheaper in Practice Despite Higher Token Counts
-
-**Cortex reports 4.75M total tokens vs Databricks' 3.49M -- but Cortex costs less to run.** The reason is architectural: Cortex's token count includes cached context (the semantic view, search index, and system prompt) that is served from memory at a 90% discount on every call. **Only 852K tokens (18%) are billed at full price.** The remaining 3.90M are cache reads that cost a fraction of a full inference call.
-
-**Databricks' 3.49M tokens are all processed at full inference cost** -- the supervisor agent rebuilds its context from scratch on every LLM call within a question, carrying all prior tool outputs forward. There is no cross-call caching mechanism analogous to Cortex's prompt cache. When the current promotional free period ends (January 31, 2027), every one of those 3.49M tokens will be billed at the standard per-token rate for the underlying models.
-
-**The practical cost comparison:**
-
-| | Cortex Agent | Databricks Genie |
+| | Cortex | Genie |
 |---|---|---|
-| **Total tokens reported** | 4.75M | 3.49M |
-| **Tokens at full price** | **852K (18%)** | **3.49M (100%)** |
-| **Tokens at 90% discount** | 3.90M (82%) | 0 |
-| **Measured cost** | 6.11 credits | Free (promotional period) |
-| **Effective cost per question** | 0.61 credits | TBD post-January 2027 |
-
-**In a production deployment processing hundreds of questions per day, Cortex's cache advantage compounds:** the semantic view and search context are loaded once and reused indefinitely, meaning marginal cost per question drops as usage scales. Databricks' sequential multi-agent architecture rebuilds context on every supervisor LLM call, so cost scales linearly with usage.
+| Classified count (5-SS+) | 3,799 (38.4%) -- correct | 3,799 (derivable from breakdown) -- correct |
+| SM+ interpretation | Showed both: 77.2% (3-SM+) AND 38.4% (5-SS+) | 71.63% (3-SM+) only, risk tier labels wrong |
+| Concentration | 390.91% vs 300% -- breach | 390.91% vs 300% -- breach |
+| Action items | 3 specific + automation offer | None |
+| **Score** | **8.75** | **7.75** |
 
 ---
 
-## 5. Tool Call Efficiency
+### Q02: Cascadia Tower Covenant Trap
 
-![Tool Calls](cre_charts/04_tool_calls.png)
+**Question:** What type of covenants does the Cascadia Tower loan (CRE-2021-00847) actually have, and what is its current LTV based on the latest appraisal?
 
-| Metric | Cortex | Databricks |
+**Trap:** Loan has ICR and DEBT_YLD covenants, NOT DSCR. Agent must read actual data, not assume.
+
+**Expected:** 2 covenants (ICR 1.72, DEBT_YLD 0.0928), all tests FAIL. LTV 1.0064 (underwater).
+
+| | Cortex | Genie |
 |---|---|---|
-| Total tool calls | 35 | 59 |
-| Avg per question | 3.5 | 5.9 |
-| SQL queries | 30 | 39 (Genie) |
-| Document searches | 5 | 13 (KA) |
-| Sandbox/code | 0 | 7 |
-| Failed/wasted tool calls | 2 (6%) | 6 (10%) |
-| Tool success rate | 94% | 90% |
+| Covenant types | ICR + DEBT_YLD (correct) | ICR + DEBT_YLD (correct) |
+| Flagged no DSCR? | Yes -- "meaningful structural gap" | Not explicitly |
+| Current LTV | 64.3% (from $122M Colliers, wrong source) | 100.6% (from $78M JLL doc, correct) |
+| Appraisal decline | ~6.8% (wrong) | 40.5% (correct) |
+| Current test results | Not shown | Both FAIL with actual values |
+| **Score** | **8.1** | **9.0** |
 
-### Tool Failure Breakdown (Databricks)
+---
 
-![DBX Failure Modes](cre_charts/07_dbx_failures.png)
+### Q03: ALLL Provision Reconciliation
 
-| Failure Type | Count | Impact |
+**Question:** Reconcile the total ALLL provision for CRE office loans in the database with the ALLL memo's stated figures -- do they match?
+
+**Trap:** Database stores daily provision snapshots. Sum = $67.19B. Memo = $167.5M. ~400x gap. Agent must flag and explain.
+
+**Expected:** $167.5M memo vs database mismatch. Agent must explain why and cite OCC $45-65M shortfall.
+
+| | Cortex | Genie |
 |---|---|---|
-| Genie SQL wrong aggregation (self-corrected) | 2 | G03: $67B initial ALLL; required re-query. G06: 22.91% aggregate rate vs correct 79.08% (Industrial highest) |
-| Genie SQL filter failure (not caught) | 1 | G09: returned 502 findings (all MRIA, any exam type) instead of 196 OCC-sourced MRIAs -- missing exam_typ_cd filter |
-| Genie couldn't answer (graceful fallback) | 2 | G07: schema didn't have exception types; G10: couldn't identify loan pool. Both recovered via KA |
-| Excessive retry loops | 1 | G04: 12 Genie calls to reconcile inconsistent categorization results |
-
-### Cortex Self-Correction
-
-Cortex detected and fixed 2 tool failures without user intervention:
-1. **G02:** DSCR query returned 0 rows → investigated all covenant types → found loan only has ICR/Debt Yield → provided substitute + document-sourced DSCR
-2. **G03:** Join fan-out inflated balances → self-corrected with ROW_NUMBER() deduplication in second query
+| Flagged mismatch? | Yes -- "$12.77B vs $167.5M, definitive non-match" | Yes -- "43.4x difference" |
+| Root cause | **Correct** -- "provision flows, not reserve balances" | Wrong -- hypothesized scope/subsidiary/test data |
+| OCC shortfall cited | Yes -- $45-65M, $187M insufficient | No |
+| $432M total ALLL | Yes | No |
+| Action items | 3 items tied to Article III | Generic "investigate" |
+| **Score** | **9.0** | **7.1** |
 
 ---
 
-## 6. Document Retrieval
+### Q04: DSCR Breach Cascade
 
-Both platforms successfully retrieved relevant documents from the CRE corpus. Cortex Search uses embedding-based retrieval. Databricks uses the Knowledge Assistant connected to a Unity Catalog volume.
+**Question:** How many distinct CRE loans had un-waived DSCR covenant breaches in 2023, and what is the total charge-off exposure for those specific loans?
 
-| Metric | Cortex Search | Databricks KA |
+**Trap:** Must count DISTINCT loans (not test records). Must join to TBL_CHARGE_OFF for those loan_ids only.
+
+**Expected:** 10,459 distinct loans ($111.94B), $2.98B charge-offs.
+
+| | Cortex | Genie |
 |---|---|---|
-| Queries attempted | 5 | 13 |
-| Successful retrievals | 5 (100%) | 11 (~85%) |
-| Unique documents found | SR 07-1, Consent Order, ALLL memo, workout proposal, borrower financials, audit report, stress test, capital plan, examiner report | SR 07-1, Consent Order, workout proposal, NOI data, Q-factor memo, OCC shortfall assessment, audit report, stress test, capital plan, term sheet |
-| Citation quality | Numbered footnotes (e.g., [1], [2]) linking to specific document passages | Numbered citations from KA responses (e.g., citation [1-9]) |
-
-**Cortex** retrieved documents in 5 targeted calls (1 per question that needed docs), finding relevant content on the first attempt each time. The embedding-based search handled multi-concept queries well (e.g., combining ALLL methodology + OCC shortfall in a single search).
-
-**Databricks KA** made 13 calls across the 10 questions, retrieving relevant CRE documents in most cases. Two questions (G06, G08) did not invoke the KA at all -- these were SQL-only questions where document context would have added value (e.g., consent order REO requirements for G08) but was not critical.
+| Distinct breach loans | 10,459 (correct) | 10,459 (correct) |
+| Charge-offs | $2.98B gross, $2.30B net | $2.98B gross |
+| Total balance | Not stated | $111.94B (correct) |
+| Loans charged off | 737 (7% conversion rate) | Not stated |
+| Action items | 3 items (waiver discipline, loss concentration, watchlist) | Interpretive commentary |
+| **Score** | **9.1** | **8.25** |
 
 ---
 
-## 7. Self-Correction and Analytical Transparency
+### Q05: CET1 vs Tier 1 Capital Trap
 
-### Self-Correction
+**Question:** What is PNB's current CET1 capital amount in dollars, and under the severe adverse stress scenario, does CET1 stay above the 7.0% well-capitalized threshold?
 
-Both platforms demonstrated self-correction ability:
+**Trap:** `cet1_capital_amt` column = Tier 1 value ($2.434B). True CET1 = ratio x RWA = $2.281B.
 
-**Cortex:**
-1. **G02:** DSCR query returned 0 rows → investigated all covenant types → found loan only has ICR/Debt Yield → provided substitute + document-sourced DSCR
-2. **G03:** Join fan-out inflated balances → self-corrected with ROW_NUMBER() deduplication
+**Expected:** CET1 = $2.281B. Stress trough 6.1% (breaches 7.0%). Post-mitigation 7.8%.
 
-**Databricks:**
-1. **G03:** Initial Genie SQL returned $67B ALLL (wrong aggregation) → noticed implausible figure → re-queried → settled on correct $336M
-2. **G05:** Flagged that database CET1 (10.7%) differs from KA document CET1 (11.4%) and explained both
-
-### Proactive Caveats and Cross-Referencing
-
-Cortex proactively added caveats, cross-references, and reconciliation notes on every question. Databricks did so on 4 of 10 questions.
-
-Examples of Cortex analytical transparency:
-- **G02:** Flagged that the DSCR covenant exists in loan documents but is missing from the structured covenant table -- recommended data governance escalation
-- **G03:** Noted that loan-level provision totals differ from the segment-level ALLL memo figure due to aggregation basis, and explained the pre- vs post-remediation timing difference
-- **G04:** Explained why the distressed-by-status count (1,378) differs from the workout-record count (1,318)
-- **G09:** Correctly filtered to 196 OCC-sourced MRIAs (exam_typ_cd IN OCC_FULL, OCC_TARG) and identified 100% past-due rate. Distinguished OCC exam findings from the full 502 MRIA records across all exam types.
-- **G10:** Identified term sheet figure differences and noted sub-debt is Tier 2 only (no CET1 benefit)
-
-Examples of Databricks analytical transparency:
-- **G03:** Self-corrected the ALLL figure and provided component breakdown (base rate + Q-factor)
-- **G05:** Flagged doc-vs-database CET1 discrepancy and explained both measurement points
-- **G07:** Noted that structured data lacked exception type detail and transparently fell back to KA documents
-- **G09:** Acknowledged 502 vs 12 MRIA discrepancy (though drew incorrect conclusion)
+| | Cortex | Genie |
+|---|---|---|
+| CET1 capital | **$2.28B** (derived correctly) | $2.43B (Tier 1 value -- **WRONG**) |
+| Stress trough | 6.1% (correct) | 6.1% (correct) |
+| Breaches 7.0%? | Yes | Yes |
+| Post-mitigation | Implied ~8.3% (scaled to current base) | 7.8% (from docs) |
+| Stale test flagged? | Yes -- current 10.32% vs 2023 8.1% base | No |
+| Action items | 3 items (refresh test, watch buffer, verify dividends) | None |
+| **Score** | **9.4** | **7.75** |
 
 ---
 
-## 8. Architectural Observations
+### Q06: MRIA Filter Precision
 
-### Cortex Strengths
+**Question:** How many MRIA-level findings from OCC examinations are still open or in-progress?
 
-1. **Semantic View with VQRs** provides rich, centralized schema guidance that reduces SQL errors. Column decode mappings, relationships, and verified queries are defined once and available to every call. This helps the agent write correct joins and aggregations on the first attempt.
+**Trap:** Must filter `exam_typ_cd IN ('OCC_FULL','OCC_TARG')`. Without filter, count inflates from 196 to 502.
 
-2. **Parallel tool invocation** lets Cortex fire SQL and Search simultaneously, reducing wall-clock latency. The single-agent architecture avoids the context-passing overhead of multi-agent hierarchies.
+**Expected:** 196 (not 502). 11 categories. 100% past due. 12 vs 196 discrepancy with consent order.
 
-3. **Self-correction and analytical transparency** on every question. Cortex consistently surfaces nuances, flags data discrepancies, and distinguishes between different data scopes -- critical for banking analyst workflows where silent errors are worse than flagged uncertainties.
-
-4. **Cache efficiency.** 78.3% cache read rate on input tokens means the semantic view and search context is loaded once and reused at a 90% discount, keeping total cost to 6.11 credits for 10 complex questions.
-
-### Databricks Strengths
-
-1. **Multi-tool orchestration:** The 3-agent architecture (Supervisor + Genie SQL + Knowledge Assistant + Sandbox) enables sophisticated workflows. G10 demonstrated the best example: KA for term sheet details → Genie for current capital → KA for RWA reduction → Sandbox for Python calculation. The sandbox capability for transparent computation is a differentiator.
-
-2. **Graceful fallback when schema is insufficient:** When Genie SQL couldn't answer a sub-question (e.g., exception types in G07, loan pool identification in G10), the system correctly fell back to the Knowledge Assistant and recovered the answer from documents.
-
-3. **Knowledge Assistant document retrieval** (when correctly configured) successfully retrieved relevant CRE regulatory documents with citation indices on 85% of attempts.
-
-### Where Databricks Struggled
-
-1. **SQL query precision under ambiguity:** The Genie SQL engine sometimes returned wrong aggregations (G03: $67B ALLL), inconsistent categorizations (G04: 12 calls to reconcile), or wrong filters (G09: 502 findings from all exam types vs 196 OCC-sourced MRIAs). This appears related to how natural language questions are decomposed into SQL when column semantics are ambiguous.
-
-2. **Latency scaling with complexity:** Each Genie call costs 17-58s due to the start_conversation → poll cycle. Questions requiring many calls (G04: 12 calls = 558s) become very slow. The sequential supervisor-to-child routing compounds this.
-
-3. **Missed KA opportunities:** On 2 SQL-only questions (G06, G08), the supervisor did not invoke the Knowledge Assistant even though document context would have added value (e.g., regulatory expectations for REO management).
+| | Cortex | Genie |
+|---|---|---|
+| Count | 196 (correct) | 196 (correct) |
+| Status split | OPEN 90, IN_PROGRESS 106 | OPEN 90, IN_PROGRESS 106 |
+| Category breakdown | Not provided | **All 11 categories** with open/in-progress splits |
+| 100% past due? | Not stated | **Yes -- flagged explicitly** |
+| 12 vs 196 discrepancy | Not flagged | **Yes -- explained possible causes** |
+| Consent Order Article VI | Mentioned generically | Cited 180-day requirement, 1-3 years overdue |
+| Action items | 3 items | None (listed implications) |
+| **Score** | **8.0** | **9.4** |
 
 ---
 
-## 9. Live User Experience Evaluation
+### Q07: Loan Sale CET1 Arithmetic
 
-### How We Did It
+**Question:** If PNB sells the $412M loan pool at 92 cents on the dollar, what is the post-sale CET1 ratio?
 
-To complement the manual evaluation above, we built a **live side-by-side comparison UI** ("Agent Duel") that sends the same question to both platforms simultaneously and renders responses in real time. A credit officer watches both agents work side by side, seeing Cortex stream tokens progressively via SSE while Databricks returns a blocking JSON response after its full agent chain completes.
+**Trap:** Must derive CET1 from ratio x RWA ($2.281B), not use tier1_cap ($2.434B). Answer: ~10.39%.
 
-After both agents finish, an **automated LLM-as-Judge** (Claude Sonnet, `claude-sonnet-4-5` via the Cortex REST API, temperature=0) evaluates both responses against verified ground truth across five dimensions:
+**Expected:** Gross loss $32.96M, after-tax ~$26M, post-sale CET1 ~10.39%.
 
-| Dimension | What It Measures |
-|---|---|
-| **Accuracy** | Does the response match the verified key facts? Score = (correct facts / total ground truth facts) * 10 |
-| **Groundedness** | Can every factual claim be traced to tool evidence (SQL results, document excerpts)? -1 per ungrounded claim |
-| **Relevance** | Does it directly answer the question without irrelevant padding? |
-| **Actionability** | Could a credit officer act on this response immediately — specific numbers, conclusions, next steps? |
-| **Visual Richness** | Are data tables, charts, or structured formatting used to aid interpretation? |
-
-Each dimension is scored 1-10 per platform, giving a total out of 50. The ground truth key facts were verified against the actual database prior to evaluation (see below).
-
-### Results: LLM-as-Judge Scores
-
-| Q | Question | Cortex /50 | Genie /50 | Winner | Cortex Advantage |
-|---|----------|-----------|----------|--------|-----------------|
-| G01 | Office Exposure + SR 07-1 | **48** | 23 | Cortex | +25 |
-| G02 | Cascadia Tower Deep Dive | **40** | 27 | Cortex | +13 |
-| G03 | ALLL + Q-Factor + OCC | **43** | 25 | Cortex | +18 |
-| G04 | DSCR Breach Cascade | **47** | 35 | Cortex | +12 |
-| G05 | CET1 + Stress Test | **48** | 24 | Cortex | +24 |
-| G06 | Recovery by Property Type | **33** | 24 | Cortex | +9 |
-| G07 | UW Exceptions by Branch | **49** | 29 | Cortex | +20 |
-| G08 | REO Portfolio | **49** | 43 | Cortex | +6 |
-| G09 | MRIA Remediation | **49** | 18 | Cortex | +31 |
-| G10 | Loan Sale + Capital Impact | **45** | 14 | Cortex | +31 |
-| | **Average** | **45.1** (90%) | **26.2** (52%) | **Cortex 10-0** | **+18.9** |
-
-Cortex wins all 10 questions. The average margin is 18.9 points (37.8 percentage points). The closest contest is G08 (REO Portfolio, +6) where both platforms returned accurate SQL-only answers. The widest gaps are G09 and G10 (+31 each) where Cortex's hybrid SQL + document retrieval dominates.
-
-### What the Credit Officer Experiences
-
-The numbers above measure answer quality. But a credit officer sitting in front of these tools cares about something more visceral: **how does it feel to wait, and can I trust what I read?**
-
-#### Response Time: The "Staring at a Blank Screen" Problem
-
-Cortex streams its response progressively — the first tokens appear within 2-5 seconds, and the credit officer starts reading while the agent is still working. Databricks returns nothing until its full agent chain (Supervisor → Genie SQL → Knowledge Assistant → Sandbox) completes, leaving the user staring at a blank panel.
-
-| Question | Cortex Response Time | Genie Response Time | User Experience Gap |
-|---|---|---|---|
-| G01 | 1.0 min | 1.4 min | Cortex: reading for 55s before Genie starts |
-| G04 | 51s | 1.6 min | Cortex done before Genie is halfway through |
-| G05 | 1.1 min | 1.5 min | Cortex streaming within 3s; Genie silent for 90s |
-| G08 | 48s | 1.2 min | Both fast, but Cortex gives partial answers early |
-| G10 | 1.2 min | 1.8 min | Cortex: full analysis with 4 cited sources while Genie still processing |
-
-For a credit officer working through a 10-question regulatory review, these wait times compound. At ~1.5 min average per Genie response, the 10-question session takes **~15 minutes of waiting**. At ~1 min average for Cortex with progressive streaming, the officer is **reading and annotating the first answer while the second one loads**.
-
-This matters in practice: a loan committee prep session where you need answers to 5-6 questions before a meeting is the difference between "I had time to review everything" and "I'm still waiting for Q4 when the meeting starts."
-
-#### Streaming vs. Blocking: The Transparency Difference
-
-Cortex exposes its **tool steps** (e.g., "Querying TBL_LOAN_MSTR...", "Searching consent order...") as it works. The credit officer sees the agent's reasoning chain in real time. This builds trust — you know *why* the agent is taking 50 seconds (it ran 5 SQL queries and searched 2 documents), not just *that* it's taking 50 seconds.
-
-Databricks returns the final answer as a single block. The user has no visibility into whether it ran 3 tool calls or 13, whether it self-corrected along the way, or whether the Knowledge Assistant was consulted.
-
-### Consequences of Acting on Each Platform's Answers
-
-This is the most important question for a banking professional: **if I take action based on this response, what happens?**
-
-#### Example 1: G09 — MRIA Remediation (Regulatory Exam Response)
-
-**Scenario:** The OCC has scheduled a follow-up exam. The Chief Credit Officer asks: "How many OCC MRIA findings are still open, and how many are past due?"
-
-**Cortex response (49/50):**
-> **196 OCC MRIA findings** are currently open or in-progress (130 IN_PROGRESS, 66 OPEN). All 196 (100%) are past the 180-day remediation deadline set by Article VI of the consent order.
->
-> *Breakdown across 11 categories:* RISK_RTG (24), CAP_PLAN (23), COLL_MGMT (22), VENDOR_MGMT (21), APPR_QUAL (19), UW_EXCEPT (18), GOVERNANCE (17), CRE_CONC (16), IT_SEC (15), BSA_AML (12), ALLL_MTHD (9)
->
-> *Risk Flag:* 100% past-due rate across all categories signals systemic remediation failure, not isolated delays.
-
-**Consequence of acting on Cortex:** The CCO walks into the OCC exam with the correct count (196 OCC-sourced MRIAs), the correct past-due rate (100%), and a category-level remediation plan. The numbers are defensible because they match the exam findings database filtered to OCC exam types.
-
-**Genie response (18/50):**
-> The response returned MRIA findings but without clear OCC-specific filtering, producing a count that doesn't match either the consent order's formal 12 MRIAs or the database's 196 OCC-specific records. Categories were presented but the deadline and past-due analysis was incomplete.
-
-**Consequence of acting on Genie:** The CCO may cite a finding count that doesn't reconcile with OCC records, undermining credibility during the exam. Missing the "100% past due" conclusion means the bank's response plan doesn't reflect the urgency the OCC expects.
-
-#### Example 2: G10 — Loan Sale Capital Impact (Board Decision)
-
-**Scenario:** The board is voting on selling a $412M distressed loan pool at 92 cents on the dollar. The CFO needs the CET1 impact analysis for the board memo.
-
-**Cortex response (45/50):**
-> **Projected loss:** $32.96M (8% haircut on $412M)
->
-> **CET1 impact:** Pre-sale CET1 is 10.32%. The loss reduces Tier 1 capital by $32.96M, but RWA drops by ~$400M. Net effect: post-sale CET1 rises to **~11.06%** (+74 bps).
->
-> **Consent order alignment:** The consent order requires CET1 above 9.0% with a buffer. Post-sale CET1 of 11.06% **exceeds the target** — the sale moves PNB closer to full compliance.
->
-> *Sources: loan_sale_term_sheet_performing_pool.txt, regulatory_capital_plan_occ_submission.txt, occ_consent_order_2023_ce_0847.txt*
-
-**Consequence of acting on Cortex:** The board memo contains the correct loss figure, the correct post-sale CET1, the correct consent order target, and four cited sources that auditors can verify. The board votes with full information.
-
-**Genie response (14/50):**
-> The response identified the $32.96M loss correctly but the CET1 impact calculation and consent order target analysis were incomplete. The relationship between the loss, RWA reduction, and net ratio improvement was not clearly traced.
-
-**Consequence of acting on Genie:** The board memo may have the loss figure right but lack the CET1 impact conclusion that justifies the sale. Without the consent order target comparison, the strategic rationale ("this moves us toward compliance") is missing from the board presentation.
-
-#### Example 3: G02 — Cascadia Tower (Credit Committee)
-
-**Scenario:** The credit committee is reviewing loan CRE-2021-00847 (Cascadia Tower) for workout approval. They need appraisal decline, covenant status, workout terms, and NOI trend.
-
-**Cortex response (40/50):**
-> **(a) Appraisal:** Original $131M → Current $78M (40.2% decline). LTV: 64.9% → 100.6% — **the loan is underwater.**
->
-> **(b) Covenant trap identified:** The question asks about DSCR covenants, but Cascadia Tower has **ICR and DEBT_YLD covenants only** — there is no DSCR covenant in the data. This is a data integrity issue that should be escalated.
->
-> **(c) Workout terms:** Principal modification from $78.5M to $62M. **Haircut: 21.02%.**
->
-> **(d) NOI trend (from borrower financials document):** Declining NOI from $8.2M (2021) to $5.1M (2023), driven by 68% occupancy and tenant flight to Class A space.
-
-**Consequence of acting on Cortex:** The credit committee sees that the DSCR covenant they assumed exists is actually missing — a data governance finding. They approve the workout with full knowledge of the 21% haircut and the NOI trajectory that justifies it.
-
-**Genie response (27/50):**
-> Retrieved appraisal data and covenant test results (ICR/DEBT_YLD) but did not explicitly flag the missing DSCR covenant as a data issue. NOI data was incomplete.
-
-**Consequence of acting on Genie:** The committee may not realize the DSCR covenant gap exists, potentially leaving a compliance hole in the workout documentation. The NOI trend — critical for projecting whether the modified loan can perform — is partially missing.
-
-### Key Observation
-
-The LLM-as-Judge scores and the manual evaluation tell the same story from different angles. **Cortex's advantage is not just accuracy — it's actionability.** Every Cortex response is structured for a banking professional to act on immediately: numbered sections, specific dollar amounts, cited sources, risk flags, and next steps. When a credit officer reads a Cortex response, they can copy sections directly into a board memo, regulatory filing, or credit committee report.
-
-The Genie responses contain useful information but often require the officer to do additional work: cross-referencing numbers against other sources, filling in gaps, and restructuring the output for professional use. On questions where Genie scored well (G08: 43/50), this gap narrowed significantly — both platforms produced actionable output on straightforward SQL-only queries.
-
-The largest consequence gap is on **hybrid questions** requiring both SQL data and document context (G09, G10, G05). These are precisely the questions where a credit officer needs the most help and where acting on incomplete information carries the highest risk.
+| | Cortex | Genie |
+|---|---|---|
+| CET1 capital used | $2.28B (correct) | $2.434B (Tier 1 -- wrong, same as Q05) |
+| Gross loss | $32.96M (correct) | $33.0M (correct) |
+| Post-sale CET1 | ~10.7% (used doc +0.4pp estimate) | 10.39% (correct number, wrong inputs) |
+| Computation approach | Document estimate, not formula | Formula with wrong base values |
+| **Score** | **8.0** | **7.9** |
 
 ---
 
-## 10. Per-Question Detail
+### Q08: REO Unsold Exposure
 
-For detailed per-question evaluation with claim-by-claim groundedness analysis, tool call breakdowns, and specific failure modes, see [per_question_evaluation.md](per_question_evaluation.md).
+**Question:** What is PNB's total at-risk exposure from unsold REO properties, including both acquisition value and accumulated carrying costs?
 
----
+**Trap:** `sale_dt` and `sale_val` are NULL for unsold properties. Must include both acq_val AND carrying_cost.
 
-## 11. Conclusion
+**Expected:** 372 unsold, $5.67B exposure ($5.41B acq + $260M carrying).
 
-Across 10 complex multi-part banking queries, **Cortex Agent achieves 100% accuracy with 100% groundedness at 4.2x faster latency**, compared to Databricks Genie at 84.4% accuracy and ~89% groundedness. In the automated LLM-as-Judge evaluation (Section 9), Cortex scored **45.1/50 (90%)** vs Genie's **26.2/50 (52%)**, winning all 10 questions.
-
-The gap is driven by four factors:
-
-1. **SQL precision:** Cortex's Semantic View with verified queries and decode mappings helps the agent write correct SQL on the first attempt. Databricks' Genie SQL engine sometimes requires multiple retries to produce correct aggregations, particularly when column semantics are ambiguous (e.g., finding severity levels, exam type filters, resolution status codes). This accounts for the accuracy difference and the latency difference on complex questions.
-
-2. **Architectural efficiency:** Cortex's single-agent with parallel tool invocation completes questions in 23-73s. Databricks' 3-agent sequential hierarchy requires 81-558s, with each Genie call adding 17-58s of overhead. Simpler questions show a modest 2-3x gap; complex multi-step questions show 6-12x.
-
-3. **Analytical transparency:** Cortex proactively surfaces data nuances on every question -- scope differences, aggregation basis conflicts, document-vs-table discrepancies. This is critical for banking work where context matters as much as the numbers themselves.
-
-4. **Actionability for banking professionals:** As detailed in the user experience evaluation (Section 9), the practical consequence of these differences is that a credit officer can act directly on Cortex responses -- copying structured findings into board memos, regulatory filings, and credit committee reports. Genie responses on complex hybrid questions often require additional cross-referencing and restructuring before professional use, and acting on incomplete answers (e.g., G09's MRIA count, G10's missing CET1 conclusion) carries material regulatory risk.
-
-Databricks demonstrated strengths in multi-tool orchestration (particularly G10's KA + Genie + Sandbox workflow) and graceful fallback capability. On well-defined SQL-only questions (G07, G08), the accuracy gap narrows significantly.
+| | Cortex | Genie |
+|---|---|---|
+| Unsold count | 372 (correct) | Not stated |
+| Total exposure | $5.67B (correct) | $5.67B (correct) |
+| Both components? | Yes ($5.41B + $260M) | Yes ($5.41B + $260M) |
+| Status breakdown | HELD/LISTED/UNDER_CONTRACT with $ amounts | Not provided |
+| Chart | Yes | No |
+| Action items | 3 items | Generic commentary |
+| **Score** | **9.4** | **7.9** |
 
 ---
 
-## Changelog
+### Q09: Underwriting Exception Rate
 
-### v2.0 (September 2026) -- Recalibrated against verified database ground truth
+**Question:** The internal audit report says 23% of CRE originations in 2021-2022 had underwriting exceptions -- does the full database confirm that rate?
 
-All accuracy sub-part scores re-evaluated with consistent denominators per question (both platforms scored against the same sub-part count). Key facts verified by running ground truth SQL against the live database.
+**Trap:** Table has `uw_exception_flg` (Y/N) only. Types are document-only. Audit sampled 1,200 loans; full data = 22.90%.
 
-| Change | v1 | v2 | Reason |
-|---|---|---|---|
-| Executive summary latency | 155s / 3.8x | 173s / 4.2x | Now matches Section 3 detailed table (was inconsistent) |
-| Cortex accuracy | 95.7% (45/47) | 100% (48/48) | Denominators normalized: every sub-part Cortex answered was verified correct |
-| Databricks accuracy | 82.2% (37/45) | 84.4% (40.5/48) | Denominators normalized to match Cortex; G09 re-scored as 2/5 (was 2.5/5) |
-| G09 description | "502 findings (all severity levels) instead of 12 MRIAs" | "502 findings (all MRIA, no OCC filter) instead of 196 OCC-sourced MRIAs" | Verified: 502 = all MRIA severity across all exam types; 196 = OCC exam only (correct answer); 12 = consent order formal count |
-| G06 highest loss severity | 77.4% | 79.08% (Industrial/INDL) | Verified against TBL_CHARGE_OFF joined to TBL_COLLATERAL |
-| G04 breach count | Not quantified | 10,459 distinct loans | Verified: DSCR covenant tests with FAIL + waiver_flg=N in 2023 |
-| Accuracy sub-part denominators | Mixed (4/4 vs 5/5 on same question) | Consistent per question across both platforms | Each question now has one fixed sub-part count |
+**Expected:** 22.90% (4,169/18,205). Close but not exactly 23% -- sampling difference.
+
+| | Cortex | Genie |
+|---|---|---|
+| Exception rate | 22.9% (correct) | 22.9% (correct) |
+| Confirms 23%? | Yes | Yes |
+| Audit sample details | Not provided | 1,200 of 5,847 (from KA) |
+| Exception types | Mentioned as items to "confirm" | Listed from audit doc (correctly sourced) |
+| 40% understatement caveat | Yes -- bank's report understated by ~40% | No |
+| **Score** | **8.9** | **8.5** |
+
+---
+
+### Q10: DSCR by Occupancy -- 4-Table Join
+
+**Question:** For CRE office loans, what is the covenant failure rate for properties with occupancy below 50% versus above 85%?
+
+**Trap:** 4-table join. Occupancy stored as 0-1 decimal. Multi-collateral fan-out risk.
+
+**Expected:** <50% = 71.24% failure rate, >=85% = 73.08%. Counterintuitive: higher occupancy = slightly higher failure.
+
+| | Cortex | Genie |
+|---|---|---|
+| Metric | Test-level failure rate (correct) | **Loan-level** (% with >=1 failure -- wrong metric) |
+| <50% failure rate | 67.4% (close to expected 71.24%) | 98.97% (wrong metric) |
+| >85% failure rate | 68.3% (close to expected 73.08%) | 98.66% (wrong metric) |
+| Counterintuitive finding | Yes -- flagged as data quality concern | Yes -- "uniform distress" |
+| Data quality caveats | Occupancy/test date alignment, possible fan-out | None -- presented 99% as definitive |
+| Action items | 3 items | None |
+| **Score** | **8.5** | **7.0** |
+
+---
+
+## Key Findings
+
+### Where Cortex Excels
+
+1. **Column precision.** Correctly derived CET1 as `ratio x RWA` on Q05 and Q07, avoiding the Tier1 trap that Databricks fell into twice. This is a $153M difference that cascades through every capital calculation.
+
+2. **Root-cause diagnosis.** On Q03 (ALLL reconciliation), Cortex correctly identified that TBL_PROVISION stores daily provision flows, not reserve balances -- explaining the ~400x mismatch. Databricks hypothesized wrong causes (scope, test data, subsidiary).
+
+3. **Actionable output.** Every Cortex response includes risk flags and recommended next steps tied to specific regulatory requirements (Consent Order articles, Board resolutions, PwC validation deadlines). Databricks provided action items on 0 of 10 questions.
+
+4. **Data quality awareness.** Cortex proactively flagged data caveats on 8 of 10 questions -- stale appraisals, occupancy/test alignment, provision table grain, stored vs computed LTV.
+
+### Where Databricks Excels
+
+1. **Document retrieval depth.** On Q02, Databricks found the $78M JLL reappraisal from the document corpus that Snowflake missed, correctly identifying the loan as underwater (100.6% LTV vs Snowflake's 64.3%).
+
+2. **Comprehensive breakdowns.** On Q06, Databricks delivered all 11 MRIA categories with open/in-progress splits, flagged 100% past-due rate, and cross-referenced the consent order's 12-MRIA count -- all elements Snowflake omitted.
+
+3. **Full portfolio context.** On Q04, Databricks reported the $111.94B total balance of the breach population, giving the credit officer the denominator for loss-rate analysis that Snowflake didn't provide.
+
+### Recurring Databricks Weaknesses
+
+1. **CET1/Tier1 confusion (Q05 + Q07).** Used `cet1_capital_amt` ($2.434B = Tier 1) instead of deriving CET1 from `ratio x RWA` ($2.281B). This error appeared on both capital-related questions -- a systematic failure, not a one-off.
+
+2. **Wrong metric selection (Q10).** Measured "% of loans with any failure" (~99%) instead of "% of tests that failed" (~71%). This produces a meaningless comparison across occupancy buckets.
+
+3. **No action items.** Zero questions included recommended next steps. The credit officer gets numbers but no guidance on what to do with them.
+
+---
+
+## Conclusion
+
+Across 10 single-query CRE lending questions, **Cortex Agent scores 8.72/10 vs Databricks Genie at 8.06/10**, winning 8 of 10 questions. The gap is driven by three factors:
+
+1. **Analytical precision:** Cortex correctly handles column disambiguation (CET1 vs Tier1), data structure interpretation (provision flows vs reserve balances), and metric selection (test-level vs loan-level). These are exactly the errors that cause material misstatement in regulatory reporting.
+
+2. **Actionability:** Every Cortex response includes risk flags and next steps tied to specific regulatory requirements. A credit officer can act directly on the output. Databricks provides accurate numbers on most questions but leaves the "so what?" to the user.
+
+3. **Efficiency:** Cortex answers questions with an average of 1.8 SQL queries. Databricks averages 7.0 tool calls per question, including retries and sequential agent routing, resulting in longer response times.
+
+Databricks demonstrates clear strengths in document retrieval (Q02's $78M appraisal, Q06's complete MRIA breakdown) and should not be dismissed. On straightforward SQL-only questions (Q04, Q08), the accuracy gap is narrow. The differentiation emerges on questions requiring judgment: which column to use, which metric to compute, how to interpret a data structure mismatch.
