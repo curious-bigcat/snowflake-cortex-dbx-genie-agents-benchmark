@@ -41,3 +41,7 @@ live_compare/dist/
 .env
 .env.*
 reports/blog_cortex_vs_genie.md
+
+# Benchmark files (not ready for public)
+questions/cre_benchmark_questions.md
+reports/cre_benchmark_report.md
